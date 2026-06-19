@@ -57,6 +57,11 @@ const organization = {
 };
 
 const structured = jsonLd ? [organization, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])] : [organization];
+
+// GA4 (gtag.js). Public, so it lives in a PUBLIC_-prefixed env var read at
+// build time. When it is unset (e.g. a local run without the key) the snippet
+// is simply not emitted, so nothing breaks and no stray requests are made.
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
 
 <!doctype html>
@@ -67,6 +72,23 @@ const structured = jsonLd ? [organization, ...(Array.isArray(jsonLd) ? jsonLd : 
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {
+      gaId && (
+        <Fragment>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} is:inline />
+          <script is:inline define:vars={{ gaId }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', gaId);
+          </script>
+        </Fragment>
+      )
+    }
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
