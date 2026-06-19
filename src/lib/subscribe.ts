@@ -57,7 +57,13 @@ export async function sendFallbackEmail(subject: string, lines: string[]): Promi
 
 // POST the opt-in to the marketing app. 5s timeout; never retry inline. On any
 // failure returns 'noted' so the caller can fall back rather than lose consent.
-export async function subscribeEmail(email: string, firstName: string): Promise<NewsletterOutcome> {
+// `source` tells the marketing app where the opt-in came from; it defaults to
+// the contact form so that caller stays unchanged.
+export async function subscribeEmail(
+  email: string,
+  firstName: string,
+  source: string = SOURCE,
+): Promise<NewsletterOutcome> {
   if (!MARKETING_TOOL_URL || !WEBSITE_SUBSCRIBE_SECRET) {
     return 'noted';
   }
@@ -70,7 +76,7 @@ export async function subscribeEmail(email: string, firstName: string): Promise<
         Authorization: `Bearer ${WEBSITE_SUBSCRIBE_SECRET}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, first_name: firstName || undefined, source: SOURCE }),
+      body: JSON.stringify({ email, first_name: firstName || undefined, source }),
       signal: controller.signal,
     });
     if (res.status === 200) {

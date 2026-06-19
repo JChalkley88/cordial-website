@@ -2,8 +2,15 @@
 // The calm inline newsletter sign-up used on the Journal preview and post
 // pages. Posts server-side to /api/subscribe (marketing app + Resend fallback).
 // Styling lives in cordial.css (.nl-inline). Digest framing per the brief.
+// `source` flows through to the marketing app so the preview-page signup
+// (website-journal) can be told apart from the after-a-post one
+// (website-journal-post).
+interface Props {
+  source?: string;
+}
+const { source = 'website-journal' } = Astro.props;
 ---
-<div class="nl-inline" data-journal-subscribe>
+<div class="nl-inline" data-journal-subscribe data-source={source}>
   <p class="eyebrow nli-eyebrow">The Cordial digest</p>
   <h2 class="nli-title">A note, roughly fortnightly.</h2>
   <p class="nli-copy">
@@ -29,6 +36,7 @@
       const input = form.querySelector<HTMLInputElement>('input[type="email"]');
       const done = wrap.querySelector<HTMLElement>('.nli-done');
       const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const source = (wrap as HTMLElement).dataset.source || 'website-journal';
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = (input?.value || '').trim();
@@ -42,7 +50,7 @@
           const res = await fetch('/api/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ email, source }),
           });
           const data = await res.json().catch(() => ({}));
           if (data && typeof data.message === 'string' && data.message) message = data.message;

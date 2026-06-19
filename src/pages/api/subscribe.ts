@@ -13,6 +13,12 @@ function str(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+// Standalone signups identify where they sit so the marketing app can tell
+// them apart. Anything off this list (or absent) falls back to the Journal,
+// which is the only standalone signup that exists today.
+const ALLOWED_SOURCES = ['website-journal', 'website-journal-post', 'website-footer'];
+const DEFAULT_SOURCE = 'website-journal';
+
 export const POST: APIRoute = async ({ request }) => {
   let body: Record<string, unknown>;
   try {
@@ -27,7 +33,10 @@ export const POST: APIRoute = async ({ request }) => {
     return json(400, { ok: false, error: 'Please enter a valid email address.' });
   }
 
-  const outcome = await subscribeEmail(email, firstName);
+  const requested = str(body.source);
+  const source = ALLOWED_SOURCES.includes(requested) ? requested : DEFAULT_SOURCE;
+
+  const outcome = await subscribeEmail(email, firstName, source);
   if (outcome === 'noted') {
     await sendFallbackEmail('Newsletter opt-in (subscribe unreachable)', [
       'A newsletter opt-in could not be recorded by the marketing app.',
