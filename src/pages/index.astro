@@ -1,0 +1,217 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Wordmark from '../components/Wordmark.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { SITE, SOCIAL } from '../lib/site';
+import coverImg from '../assets/cover-bench.png';
+import breakImg from '../assets/break-bowl.png';
+import '../styles/home.css';
+
+const title = 'Cordial Advisory';
+const description = SITE.description;
+---
+
+<BaseLayout title={title} description={description} theme="dark" ogImage="/og-default.png">
+  <div class="bg-field" id="bgField"></div>
+
+  <!-- Opening intro: plays once, on a visitor's first arrival only. -->
+  <div class="intro" id="intro">
+    <div class="content">
+      <span class="intro-mark">
+        <span class="name">Cordial</span><span class="sub">ADVISORY</span>
+      </span>
+      <hr class="accent-rule intro-rule" />
+      <p class="intro-strap">We take the friction out of good businesses.</p>
+    </div>
+  </div>
+
+  <!-- Top bar: theme-switching, fixed. The Book pill glides to the booking section. -->
+  <header class="topbar">
+    <div class="topbar-left" style="display:flex;align-items:center;gap:clamp(10px,2vw,22px);">
+      <button class="menu-btn" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu-overlay">
+        <span></span><span></span>
+      </button>
+      <Wordmark href="#" home={true} />
+    </div>
+    <a class="btn btn-bar" href="#book" data-go="4">Book a consultation</a>
+  </header>
+
+  <main class="track" id="track">
+    <!-- 0 · COVER -->
+    <section class="sec dark" id="p0" data-name="Cover" data-dark>
+      <div class="sec-photo" id="photo-cover">
+        <Image
+          class="sec-bg"
+          src={coverImg}
+          alt=""
+          data-mx="0.05"
+          loading="eager"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+        />
+        <div class="cover-scrim"></div>
+      </div>
+      <div class="sec-inner cover-inner">
+        <div class="measure">
+          <p class="eyebrow on-dark sec-eyebrow">Efficiency Advisory &nbsp;·&nbsp; Oxfordshire</p>
+          <h1 class="cover-title">
+            <span>Grow your</span>
+            <span>business without</span>
+            <span>losing what</span>
+            <span>makes it <em><span class="accent-word">yours.</span></em></span>
+          </h1>
+          <p class="cover-lede">
+            We find the friction in how your business runs, and take it out.
+            Plainly, practically, with AI only where it earns its place.
+          </p>
+          <div class="cover-actions">
+            <a class="btn btn-cream" href="#book" data-go="4">Book a consultation</a>
+            <a class="btn btn-ghost on-dark" href="#how" data-go="2">See what an audit looks like</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 · WHAT WE DO (services: how we help) -->
+    <section class="sec" id="p1" data-name="What we do">
+      <div class="sec-inner scrolls">
+        <div class="measure">
+          <p class="eyebrow sec-eyebrow">What we do</p>
+          <h2 class="sec-h2" data-mx="-0.07">How we <em>help.</em></h2>
+          <p class="hwh-intro">
+            Most of what we do comes down to taking the repetitive, scattered,
+            time-consuming parts of running a business and making them
+            <span class="accent-word">quieter</span>, so your team gets back to the
+            work they are good at.
+          </p>
+          <div class="hwh-list" data-mx="0.02">
+            <div class="hwh-item">
+              <div class="hwh-name">Take the repeat work off their hands.</div>
+              <p class="hwh-desc">The jobs done by hand the same way every time, quoting, reporting, the documents that get retyped. We build a tool, shaped around your business, that does the repetitive part so your people keep the judgement and get the time back.</p>
+            </div>
+            <div class="hwh-item">
+              <div class="hwh-name">Join up your systems, and see the business clearly.</div>
+              <p class="hwh-desc">Pull what is scattered across spreadsheets, inboxes and half-used software into one place that talks to itself. Live, current information instead of a report built by hand the night before, the picture of the business there when you want it.</p>
+            </div>
+            <div class="hwh-item">
+              <div class="hwh-name">Smooth how work flows.</div>
+              <p class="hwh-desc">The handoffs between people and teams, from first enquiry to final invoice, made quicker and cleaner, so work stops getting stuck.</p>
+            </div>
+            <div class="hwh-item">
+              <div class="hwh-name">Keep it above board.</div>
+              <p class="hwh-desc">The quality, process and safety side done properly, the kind that stands up to a customer, a regulator or a board.</p>
+            </div>
+          </div>
+          <p class="hwh-close">The point of all of it is the same. Less time on the work that drains a team, more time on the work only they can do.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · HOW WE DO IT (offers) -->
+    <section class="sec" id="p2" data-name="How we do it">
+      <div class="sec-inner scrolls">
+        <div class="measure">
+          <p class="eyebrow sec-eyebrow">How we do it</p>
+          <h2 class="sec-h2" data-mx="-0.07">See how the work flows. Then ease what <em>slows it.</em></h2>
+          <div class="wwd" data-mx="0.025">
+            <div class="wwd-item">
+              <div class="wwd-body">
+                <div class="wwd-name">Audit</div>
+                <div class="wwd-price">&pound;3,500 &middot; one fee</div>
+                <p class="wwd-desc">A day on site, both directors, following a job through the business to find where it <span class="accent-word">snags</span>. A week or two later you get it in writing: a Friction Report on what is slowing the business down, and a Six Month Plan on what to do about it. The plan stands on its own, and you can take it elsewhere.</p>
+              </div>
+            </div>
+            <div class="wwd-item">
+              <div class="wwd-body">
+                <div class="wwd-name">Implementation</div>
+                <div class="wwd-price">Fixed fee &middot; against a written scope</div>
+                <p class="wwd-desc">If you want to go on, we build the plan with you. Sometimes a tool, often the operational work, usually a mix. Whatever we build is yours at the end, documented, and easy to maintain.</p>
+              </div>
+            </div>
+            <div class="wwd-item">
+              <div class="wwd-body">
+                <div class="wwd-name">Support</div>
+                <div class="wwd-price">Agreed once &middot; reviewed quarterly</div>
+                <p class="wwd-desc">We stay close on terms that fit. A small monthly arrangement, or a regular retainer.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · PHOTOGRAPHIC BREAK -->
+    <section class="sec dark" id="p3" data-name="A note on craft" data-dark>
+      <div class="sec-photo" id="photo-break">
+        <Image
+          class="sec-bg"
+          src={breakImg}
+          alt=""
+          data-mx="0.05"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+        />
+        <div class="break-scrim"></div>
+      </div>
+      <div class="sec-inner" style="z-index:2;">
+        <div class="measure">
+          <h2 class="break-line" data-pin="0.05">
+            <span>Giving a small team the <span class="accent-word">reach</span></span>
+            <span>of a much <em>larger</em> one.</span>
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · BOOK + BACK COVER -->
+    <section class="sec" id="p8" data-name="Book a consultation">
+      <div class="sec-inner scrolls">
+        <div class="measure">
+          <ContactSection mode="full" />
+
+          <footer class="book-foot-clean">
+            <div class="bfc-rule"></div>
+            <div class="bfc-row">
+              <div>
+                <Wordmark href="#" home={true} />
+                <p class="bfc-addr">
+                  {SITE.locality}, {SITE.region} &middot;
+                  <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+                </p>
+              </div>
+              <div class="bfc-right">
+                <div class="bfc-social">
+                  <a href={SOCIAL.linkedin} aria-label="LinkedIn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.3 0-2.95-1.8-2.95-1.8 0-2.07 1.4-2.07 2.85V21H9z"/></svg>
+                  </a>
+                  <a href={SOCIAL.x} aria-label="X">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.22-6.82-5.97 6.82H1.66l7.73-8.84L1.24 2.25h6.83l4.71 6.23zm-1.16 17.52h1.83L7.01 4.13H5.04z"/></svg>
+                  </a>
+                </div>
+                <p class="bfc-copy">
+                  &copy; 2026 {SITE.legalName} &nbsp;&middot;&nbsp;
+                  <a href="/privacy">Privacy</a> &nbsp;&middot;&nbsp; <a href="/terms">Terms</a>
+                </p>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Screen-reader live region: the ribbon announces the section in view. -->
+  <div class="sr-only" role="status" aria-live="polite" id="sr-status">Cover. 1 of 5.</div>
+</BaseLayout>
+
+<style is:global>
+  /* No-JS: never trap the visitor behind the intro veil. */
+  html:not(.js) .intro { display: none; }
+  /* Real <img> backgrounds (replacing the prototype image-slot) cover their box. */
+  .sec-bg { object-fit: cover; }
+</style>
+
+<script>
+  import '../scripts/ribbon.js';
+</script>

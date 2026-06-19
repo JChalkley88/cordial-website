@@ -1,0 +1,175 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import jackImg from '../assets/jack-portrait.png';
+import anthonyImg from '../assets/anthony-portrait.png';
+
+const title = 'About | Cordial Advisory';
+const description =
+  'Both ends of the business, in the room. Jack Chalkley and Anthony Pothecary, the two co-founders of Cordial Advisory, commercial and operations.';
+---
+
+<BaseLayout title={title} description={description} theme="light">
+  <TopBar />
+
+  <main class="page">
+    <div class="ahead reveal-up">
+      <p class="eyebrow">About</p>
+      <h1>Both ends of the business, <em>in the <span class="accent-word">room.</span></em></h1>
+    </div>
+
+    <div class="founders">
+      <article class="founder reveal-up">
+        <Image class="portrait" src={jackImg} alt="Jack Chalkley" widths={[280, 460]} sizes="(max-width: 720px) 90vw, 220px" />
+        <h2>Jack Chalkley</h2>
+        <p class="role">Co-founder</p>
+        <p>Four years as Sales Director and then Managing Director of a British luxury studio, and nine years before that running sales teams in luxury travel. Somewhere along the way the part I cared most about became coaching and process: taking friction out of the work, anything quietly slowing a good team down.</p>
+        <p>It was also when AI became the thing I would not stop reading about. I started building small tools inside the business to take out the bits that quietly cost the most. Cordial is the formal version of that habit.</p>
+        <p class="email"><a href="mailto:jack@cordialadvisory.co.uk">jack@cordialadvisory.co.uk</a></p>
+      </article>
+
+      <article class="founder reveal-up">
+        <Image class="portrait" src={anthonyImg} alt="Anthony Pothecary" widths={[280, 460]} sizes="(max-width: 720px) 90vw, 220px" />
+        <h2>Anthony Pothecary</h2>
+        <p class="role">Co-founder</p>
+        <p>Twenty-five years in operations across UK manufacturing and workshop businesses, nine of them running production, quality, facilities and safety at a cryogenics manufacturer while the UK division grew by about a third.</p>
+        <p>Then Director of Operations, later Managing Director of Operations, at a luxury sculpture studio in Oxfordshire, where Jack and I worked the same problems from opposite ends for a year. My half is the quiet half: process, workshop flow, the handoffs between departments, the safety and quality systems a growing business needs but rarely builds.</p>
+        <p class="email"><a href="mailto:anthony@cordialadvisory.co.uk">anthony@cordialadvisory.co.uk</a></p>
+      </article>
+    </div>
+
+    <footer class="afoot">
+      <a class="back" href="/contact">Work with us <span class="arrow">&rarr;</span></a>
+      <span class="mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<script>
+  import '../scripts/reveal.js';
+</script>
+
+<style>
+  .page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: clamp(96px, 12vh, 130px) clamp(24px, 5vw, 56px) clamp(56px, 8vh, 88px);
+  }
+  .ahead {
+    max-width: 900px;
+    margin-bottom: clamp(28px, 4vh, 48px);
+  }
+  .ahead .eyebrow {
+    margin-bottom: 22px;
+  }
+  .ahead .eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  .ahead h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(34px, 5vw, 60px);
+    color: var(--slate);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    margin: 0;
+    max-width: 17ch;
+  }
+  .ahead h1 em {
+    font-style: italic;
+  }
+  .founders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(36px, 5vw, 72px);
+    align-items: start;
+  }
+  .founder .portrait {
+    height: clamp(150px, 22vh, 220px);
+    width: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: clamp(14px, 2vh, 20px);
+  }
+  .founder h2 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: clamp(22px, 2.4vw, 29px);
+    color: var(--slate);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .founder .role {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--aubergine);
+    margin: 6px 0 0;
+  }
+  .founder p {
+    font-size: clamp(15px, 1.45vw, 17px);
+    line-height: 1.58;
+    color: var(--body);
+    margin: 0.95em 0 0;
+    max-width: 460px;
+  }
+  .founder .email {
+    font-size: clamp(15px, 1.45vw, 17px);
+    margin-top: 16px;
+  }
+  .founder .email a {
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair-strong);
+    padding-bottom: 1px;
+  }
+  .founder .email a:hover {
+    opacity: 0.66;
+  }
+  .afoot {
+    margin-top: clamp(56px, 8vh, 96px);
+    padding-top: 30px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .afoot .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .afoot .back:hover {
+    opacity: 0.66;
+  }
+  .afoot .mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+  @media (max-width: 720px) {
+    .founders {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .founder .portrait {
+      aspect-ratio: 3 / 2;
+    }
+  }
+</style>

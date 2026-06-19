@@ -1,0 +1,178 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopBar from '../../components/TopBar.astro';
+import JournalNewsletter from '../../components/JournalNewsletter.astro';
+import { postSlug, postPath, formatDate, readingTime, type JournalEntry } from '../../lib/journal';
+import { SITE } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('journal', ({ data }) => data.draft !== true);
+  return posts.map((entry) => ({ params: { slug: postSlug(entry) }, props: { entry } }));
+}
+
+interface Props {
+  entry: JournalEntry;
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const { data } = entry;
+const isoDate = data.date.toISOString().slice(0, 10);
+const url = new URL(postPath(entry), SITE.url).href;
+
+const BIOS: Record<string, string> = {
+  'Jack Chalkley': 'is a co-founder of Cordial Advisory, working on the commercial side.',
+  'Anthony Pothecary': 'is a co-founder of Cordial Advisory, working on operations and process.',
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: data.title,
+  description: data.metaDescription,
+  author: { '@type': 'Person', name: data.author },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: SITE.locality,
+      addressRegion: SITE.region,
+      addressCountry: SITE.country,
+    },
+  },
+  datePublished: isoDate,
+  dateModified: isoDate,
+  articleSection: data.type,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  ...(data.image ? { image: data.image } : {}),
+};
+---
+
+<BaseLayout
+  title={`${data.titleTag} | Cordial Advisory`}
+  description={data.metaDescription}
+  theme="light"
+  ogType="article"
+  ogImage={data.image || undefined}
+  menu={false}
+  jsonLd={articleLd}
+>
+  <TopBar burger={false} />
+
+  <article class="article">
+    <div class="article-head reveal-up">
+      <span class="je-label article-label">{data.type}</span>
+      <h1>{data.title}</h1>
+      <p class="byline">
+        <span class="who">{data.author}</span> &middot; {formatDate(data.date)} &middot; {readingTime(entry.body)}
+      </p>
+    </div>
+    <hr class="rule-line head-rule" />
+
+    <div class="prose reveal-up">
+      <Content />
+    </div>
+
+    <div class="article-foot reveal-up">
+      <p class="foot-author"><span class="who">{data.author}</span> {BIOS[data.author]}</p>
+      <hr class="rule-line foot-rule" />
+      <div class="foot-actions">
+        <a class="back" href="/journal"><span class="arrow">&larr;</span> More from the Journal</a>
+      </div>
+
+      <div class="foot-newsletter">
+        <JournalNewsletter />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  import '../../scripts/reveal.js';
+</script>
+
+<style>
+  .article {
+    padding: clamp(52px, 9vw, 104px) 24px clamp(72px, 9vw, 120px);
+  }
+  .article-head {
+    max-width: var(--read);
+    margin: 0 auto;
+  }
+  .article-head .article-label {
+    display: inline-block;
+  }
+  .article-head h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: clamp(34px, 5.4vw, 54px);
+    color: var(--slate);
+    margin-top: 18px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .byline {
+    font-size: 14px;
+    color: var(--body);
+    margin-top: 24px;
+  }
+  .byline .who {
+    color: var(--slate);
+    font-weight: 600;
+  }
+  .head-rule {
+    max-width: var(--read);
+    margin: 36px auto 44px;
+  }
+  .article-foot {
+    max-width: var(--read);
+    margin: clamp(56px, 8vh, 84px) auto 0;
+  }
+  .foot-author {
+    font-size: 15px;
+    color: var(--body);
+    line-height: 1.55;
+  }
+  .foot-author .who {
+    color: var(--slate);
+    font-weight: 600;
+  }
+  .foot-rule {
+    margin: 28px 0;
+  }
+  .foot-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .back:hover {
+    opacity: 0.66;
+  }
+  .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .back:hover .arrow {
+    transform: translateX(-5px);
+  }
+  .foot-newsletter {
+    max-width: var(--read);
+    margin: clamp(48px, 7vh, 80px) auto 0;
+    padding-top: clamp(34px, 5vh, 52px);
+    border-top: 1px solid var(--hair);
+  }
+</style>

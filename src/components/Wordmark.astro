@@ -1,0 +1,25 @@
+---
+// The Cordial wordmark. Renders as a link by default; pass `as="span"` for the
+// static mark used inside the burger menu head and footers.
+interface Props {
+  href?: string;
+  as?: 'a' | 'span';
+  home?: boolean;
+  class?: string;
+}
+const { href = '/', as = 'a', home = false, class: cls = '' } = Astro.props;
+const Tag = as;
+---
+{
+  Tag === 'a' ? (
+    <a class:list={['wordmark', cls]} href={href} data-home={home ? '' : undefined}>
+      <span class="name">Cordial</span>
+      <span class="sub">ADVISORY</span>
+    </a>
+  ) : (
+    <span class:list={['wordmark', cls]}>
+      <span class="name">Cordial</span>
+      <span class="sub">ADVISORY</span>
+    </span>
+  )
+}

@@ -1,0 +1,23 @@
+# build output
+dist/
+.vercel/
+.astro/
+
+# dependencies
+node_modules/
+
+# environment (secrets never committed)
+.env
+.env.local
+.env.*.local
+
+# documented design handoff — reference only, must never ship
+design-reference/
+
+# logs and os files
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# playwright test artifacts
+.playwright-mcp/

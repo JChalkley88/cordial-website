@@ -1,0 +1,102 @@
+---
+// The shared document shell: head (meta, SEO, fonts, tokens), body and the
+// burger overlay. The top bar differs per page, so pages bring their own.
+import '@fontsource/karla/400.css';
+import '@fontsource/karla/500.css';
+import '@fontsource/karla/600.css';
+import '@fontsource/source-sans-3/400.css';
+import '@fontsource/source-sans-3/500.css';
+import '@fontsource/source-sans-3/600.css';
+import '../styles/cordial.css';
+import BurgerMenu from '../components/BurgerMenu.astro';
+import { SITE } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  theme?: 'light' | 'dark';
+  bodyClass?: string;
+  ogType?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+  menu?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  theme = 'light',
+  bodyClass = '',
+  ogType = 'website',
+  ogImage = '/og-default.png',
+  noIndex = false,
+  menu = true,
+  jsonLd,
+} = Astro.props;
+
+// Clean canonical: site origin + pathname, no trailing slash (except root).
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const canonical = new URL(path, SITE.url).href;
+const ogImageUrl = ogImage ? new URL(ogImage, SITE.url).href : undefined;
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: SITE.url,
+  email: SITE.email,
+  description: SITE.description,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.locality,
+    addressRegion: SITE.region,
+    addressCountry: SITE.country,
+  },
+};
+
+const structured = jsonLd ? [organization, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])] : [organization];
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+
+    <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="The Cordial Journal" href="/journal/rss.xml" />
+
+    {
+      structured.map((item) => (
+        <script type="application/ld+json" set:html={JSON.stringify(item)} />
+      ))
+    }
+  </head>
+  <body data-theme={theme} class={bodyClass}>
+    <slot />
+    {menu && <BurgerMenu />}
+  </body>
+</html>

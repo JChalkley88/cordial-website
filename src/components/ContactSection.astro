@@ -1,0 +1,307 @@
+---
+// The single shared "Get in touch" section. One form, one handler, one leads
+// destination. Two modes:
+//   full  (homepage)  — booking calendar + consultation framing + the form
+//   calm  (contact)   — the same form only, no calendar, no consultation copy
+// Styling lives once in cordial.css (.gt-*). The form posts to /api/contact.
+import { BOOKING_URL } from '../lib/site';
+
+interface Props {
+  mode?: 'full' | 'calm';
+}
+const { mode = 'full' } = Astro.props;
+const calm = mode === 'calm';
+
+// Friendly labels shown to the visitor, mapped to the exact CRM strings on
+// submit (data-crm) so reporting stays clean. No native <select>, no browser blue.
+const HEAR_OPTS = [
+  { label: 'Google or search', crm: 'Google / search' },
+  { label: 'LinkedIn', crm: 'LinkedIn' },
+  { label: 'Our newsletter', crm: 'Newsletter' },
+  { label: 'A recommendation', crm: 'Recommendation' },
+  { label: 'An event or talk', crm: 'Event or talk' },
+  { label: 'Other', crm: 'Other' },
+];
+---
+<section
+  class:list={['gt-section', calm && 'gt-section--calm']}
+  id={calm ? 'contact' : 'book'}
+  aria-labelledby="gt-h2"
+>
+  <!-- Label wrapped in one inline unit so the flex `gap` sits only between the
+       leading dash and the text, never between the words themselves. -->
+  <p class="gt-eyebrow"><span class="gt-eyebrow-label">Get in <span class="accent-word">touch</span></span></p>
+  {
+    calm ? (
+      <Fragment>
+        <h2 class="gt-h2" id="gt-h2">Get in touch</h2>
+        <p class="gt-lede">
+          Drop us a line. Tell us a little about your business and what you are
+          wrestling with, and we will come back to you.
+        </p>
+      </Fragment>
+    ) : (
+      <Fragment>
+        <h2 class="gt-h2" id="gt-h2">Book a consultation.</h2>
+        <p class="gt-lede">
+          Forty five minutes by video. We talk about your business, what has felt
+          heavy, and whether the work we do is a <span class="accent-word">fit</span>.
+          If it is not, we say so.
+        </p>
+      </Fragment>
+    )
+  }
+
+  <div class:list={['gt-grid', calm && 'gt-grid--single']}>
+    {!calm && (
+      <div class="gt-booking">
+        <div class="gt-calendar" data-calendar>
+          <noscript>
+            <p class="gt-cal-meta" style="padding: 20px;">
+              To book a 45 minute consultation by video, visit
+              <a href={BOOKING_URL} target="_blank" rel="noopener">our booking calendar</a>.
+            </p>
+          </noscript>
+        </div>
+      </div>
+    )}
+
+    <form class="gt-form" novalidate data-contact-form>
+      <div class="gt-fields">
+        <div class="gt-field">
+          <label for="gt-name">Name</label>
+          <input id="gt-name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="gt-field">
+          <label for="gt-email">Email</label>
+          <input id="gt-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="gt-field">
+          <label for="gt-phone">Phone <span class="gt-opt">(optional)</span></label>
+          <input id="gt-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" />
+        </div>
+        <div class="gt-field">
+          <label for="gt-co">Company</label>
+          <input id="gt-co" name="company" type="text" autocomplete="organization" />
+        </div>
+        <div class="gt-field">
+          <label for="gt-note">What could we help with?</label>
+          <textarea id="gt-note" name="message" rows="2" required></textarea>
+        </div>
+        <div class="gt-field gt-field-hear">
+          <label id="gt-hear-label">How did you hear about us?</label>
+          <div class="gt-select" data-select>
+            <button
+              type="button"
+              class="gt-select-btn"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-labelledby="gt-hear-label"
+            >
+              <span class="gt-select-val placeholder" data-val>Select one</span>
+              <span class="gt-select-caret" aria-hidden="true"></span>
+            </button>
+            <ul class="gt-select-list" role="listbox" aria-labelledby="gt-hear-label" tabindex="-1">
+              {
+                HEAR_OPTS.map((o) => (
+                  <li
+                    class="gt-select-opt"
+                    role="option"
+                    data-value={o.crm}
+                    aria-selected="false"
+                  >
+                    {o.label}
+                  </li>
+                ))
+              }
+            </ul>
+            <input type="hidden" id="gt-hear" name="how_heard" value="" />
+          </div>
+        </div>
+        <label class="gt-optin" for="gt-optin">
+          <input id="gt-optin" name="newsletter" type="checkbox" />
+          <span>Yes, send me the Cordial digest, roughly fortnightly.</span>
+        </label>
+        <div class="gt-submit">
+          <button class="btn btn-primary" type="submit">Send a note</button>
+        </div>
+      </div>
+      <p class="gt-sent" role="status" aria-live="polite">
+        Thank you, your note is on its way. We will be in touch shortly.
+      </p>
+    </form>
+  </div>
+</section>
+
+<script define:vars={{ BOOKING_URL }}>
+  (function () {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+    function openBooking() { window.open(BOOKING_URL, '_blank', 'noopener'); }
+
+    // A calm month grid. Weekdays from today open the external booking flow;
+    // weekends and past dates are muted. This is a link-out, not the CRM.
+    function buildCalendar(el) {
+      if (!el) return;
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      let view = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      function render() {
+        const y = view.getFullYear(), m = view.getMonth();
+        const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const atMin = (y === today.getFullYear() && m === today.getMonth());
+
+        let h = '';
+        h += '<div class="gt-cal-head"><span class="gt-cal-title">' + MONTHS[m] + ' ' + y + '</span>' +
+          '<span class="gt-cal-nav">' +
+            '<button type="button" data-prev aria-label="Previous month"' + (atMin ? ' disabled' : '') + '>‹</button>' +
+            '<button type="button" data-next aria-label="Next month">›</button>' +
+          '</span></div>';
+        h += '<div class="gt-cal-grid">';
+        DOW.forEach((d) => { h += '<span class="gt-cal-dow">' + d + '</span>'; });
+        for (let i = 0; i < firstDow; i++) h += '<span class="gt-cal-day empty"></span>';
+        for (let d = 1; d <= daysInMonth; d++) {
+          const date = new Date(y, m, d);
+          const dow = date.getDay();
+          const weekend = (dow === 0 || dow === 6);
+          const past = date < today;
+          const isToday = date.getTime() === today.getTime();
+          const avail = !past && !weekend;
+          const cls = 'gt-cal-day' + (isToday ? ' today' : '') + (avail ? ' avail' : ' muted');
+          h += '<button type="button" class="' + cls + '"' + (avail ? ' data-book' : ' disabled tabindex="-1"') + '>' + d + '</button>';
+        }
+        h += '</div>';
+        h += '<div class="gt-cal-foot"><span class="gt-cal-meta">45 minutes · by video</span>' +
+          '<a class="btn btn-primary gt-cal-cta" href="' + BOOKING_URL + '" target="_blank" rel="noopener">Choose a time →</a></div>';
+        el.innerHTML = h;
+
+        const prev = el.querySelector('[data-prev]'), next = el.querySelector('[data-next]');
+        if (prev && !prev.disabled) prev.addEventListener('click', () => { view = new Date(y, m - 1, 1); render(); });
+        if (next) next.addEventListener('click', () => { view = new Date(y, m + 1, 1); render(); });
+        el.querySelectorAll('[data-book]').forEach((b) => b.addEventListener('click', openBooking));
+      }
+      render();
+    }
+
+    // Brand-styled "How did you hear about us?" dropdown. Mirrors the chosen
+    // CRM value into the hidden #gt-hear input so the handler reads it like any field.
+    function wireSelect(scope) {
+      const wrap = scope.querySelector('[data-select]');
+      if (!wrap) return;
+      const btn = wrap.querySelector('.gt-select-btn');
+      const valEl = wrap.querySelector('[data-val]');
+      const hidden = wrap.querySelector('input[type="hidden"]');
+      const opts = Array.prototype.slice.call(wrap.querySelectorAll('.gt-select-opt'));
+      let open = false, active = null;
+
+      function setActive(opt) { opts.forEach((o) => o.classList.toggle('active', o === opt)); active = opt; }
+      function choose(opt) {
+        opts.forEach((o) => o.setAttribute('aria-selected', o === opt ? 'true' : 'false'));
+        valEl.textContent = opt.textContent;
+        valEl.classList.remove('placeholder');
+        hidden.value = opt.getAttribute('data-value');
+        setOpen(false);
+        btn.focus();
+      }
+      function onDoc(e) { if (!wrap.contains(e.target)) setOpen(false); }
+      function onKey(e) {
+        if (e.key === 'Escape') { setOpen(false); btn.focus(); return; }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          let i = opts.indexOf(active);
+          i = (e.key === 'ArrowDown') ? Math.min(opts.length - 1, i + 1) : Math.max(0, i < 0 ? 0 : i - 1);
+          setActive(opts[i]);
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          if (active) { e.preventDefault(); choose(active); }
+        }
+      }
+      function setOpen(o) {
+        open = o;
+        wrap.classList.toggle('open', o);
+        btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+        if (o) {
+          if (!active) {
+            const sel = wrap.querySelector('.gt-select-opt[aria-selected="true"]');
+            setActive(sel || opts[0]);
+          }
+          document.addEventListener('click', onDoc, true);
+          document.addEventListener('keydown', onKey, true);
+        } else {
+          document.removeEventListener('click', onDoc, true);
+          document.removeEventListener('keydown', onKey, true);
+        }
+      }
+      btn.addEventListener('click', () => setOpen(!open));
+      opts.forEach((opt) => {
+        opt.addEventListener('click', () => choose(opt));
+        opt.addEventListener('mousemove', () => setActive(opt));
+      });
+    }
+
+    // Submit: server-side handler at /api/contact does the CRM write, the
+    // newsletter opt-in and the Resend fallbacks. The bearer tokens never reach
+    // the browser. On any failure we still show a calm thank-you.
+    const DEFAULT_THANKS = 'Thank you, your note is on its way. We will be in touch shortly.';
+    function wireForm(form) {
+      if (!form) return;
+      const sent = form.querySelector('.gt-sent');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const get = (id) => { const f = form.querySelector(id); return f ? f.value.trim() : ''; };
+        const name = get('#gt-name');
+        const email = get('#gt-email');
+        const message = get('#gt-note');
+        if (!name) { form.querySelector('#gt-name').focus(); return; }
+        if (email.indexOf('@') < 1) { form.querySelector('#gt-email').focus(); return; }
+        if (!message) { form.querySelector('#gt-note').focus(); return; }
+
+        const payload = {
+          name,
+          email,
+          phone: get('#gt-phone'),
+          company: get('#gt-co'),
+          message,
+          how_heard: get('#gt-hear'),
+          newsletter: !!(form.querySelector('#gt-optin') && form.querySelector('#gt-optin').checked),
+          submitted_at: new Date().toISOString(),
+        };
+
+        if (submitBtn) { submitBtn.disabled = true; }
+        let thanks = DEFAULT_THANKS;
+        try {
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (data && typeof data.message === 'string' && data.message) thanks = data.message;
+        } catch (x) {
+          // network failure: the user still sees a calm thank-you; the server
+          // has the Resend fallback for the cases it can reach.
+        }
+        if (sent) sent.textContent = thanks;
+        form.classList.add('sent');
+      });
+    }
+
+    // The one quiet accent word per section warms to aubergine shortly after settle.
+    function lightAccents(scope) {
+      const words = scope.querySelectorAll('.accent-word');
+      if (reduce) { words.forEach((w) => w.classList.add('lit')); return; }
+      setTimeout(() => words.forEach((w) => w.classList.add('lit')), 650);
+    }
+
+    document.querySelectorAll('.gt-section').forEach((scope) => {
+      wireForm(scope.querySelector('.gt-form'));
+      wireSelect(scope);
+      buildCalendar(scope.querySelector('[data-calendar]'));
+      lightAccents(scope);
+    });
+  })();
+</script>

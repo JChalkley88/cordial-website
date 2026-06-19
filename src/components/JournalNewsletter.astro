@@ -1,0 +1,57 @@
+---
+// The calm inline newsletter sign-up used on the Journal preview and post
+// pages. Posts server-side to /api/subscribe (marketing app + Resend fallback).
+// Styling lives in cordial.css (.nl-inline). Digest framing per the brief.
+---
+<div class="nl-inline" data-journal-subscribe>
+  <p class="eyebrow nli-eyebrow">The Cordial digest</p>
+  <h2 class="nli-title">A note, roughly fortnightly.</h2>
+  <p class="nli-copy">
+    What we are seeing inside UK businesses, and what to do about it. Roughly
+    fortnightly, and easy to leave.
+  </p>
+  <form novalidate>
+    <div class="nli-field">
+      <label for="nl-email">Email</label>
+      <input id="nl-email" name="email" type="email" autocomplete="email" placeholder="you@company.co.uk" required />
+    </div>
+    <button class="btn btn-primary" type="submit">Subscribe</button>
+  </form>
+  <p class="nli-note">No noise. Unsubscribe in one click.</p>
+  <p class="nli-done" role="status" aria-live="polite">You are on the list. Thanks.</p>
+</div>
+
+<script>
+  (function () {
+    document.querySelectorAll('[data-journal-subscribe]').forEach((wrap) => {
+      const form = wrap.querySelector('form');
+      if (!form) return;
+      const input = form.querySelector<HTMLInputElement>('input[type="email"]');
+      const done = wrap.querySelector<HTMLElement>('.nli-done');
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = (input?.value || '').trim();
+        if (email.indexOf('@') < 1) {
+          input?.focus();
+          return;
+        }
+        if (btn) btn.disabled = true;
+        let message = 'Thanks, you are on the list.';
+        try {
+          const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (data && typeof data.message === 'string' && data.message) message = data.message;
+        } catch (x) {
+          message = 'Thanks for your interest, we have noted your email and will be in touch.';
+        }
+        if (done) done.textContent = message;
+        wrap.classList.add('done');
+      });
+    });
+  })();
+</script>

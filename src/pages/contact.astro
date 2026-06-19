@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import ContactSection from '../components/ContactSection.astro';
+
+const title = 'Get in touch | Cordial Advisory';
+const description =
+  'Drop us a line. Tell us a little about your business and what you are wrestling with, and we will come back to you.';
+---
+
+<BaseLayout title={title} description={description} theme="light">
+  <TopBar />
+
+  <main class="page">
+    <ContactSection mode="calm" />
+
+    <footer class="cfoot">
+      <a class="back" href="/">Back to home <span class="arrow">&rarr;</span></a>
+      <span class="mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(56px, 9vw, 112px) clamp(24px, 5vw, 56px) clamp(72px, 9vw, 120px);
+  }
+  .cfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cfoot .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .cfoot .back:hover {
+    opacity: 0.66;
+  }
+  .cfoot .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cfoot .back:hover .arrow {
+    transform: translateX(5px);
+  }
+  .cfoot .mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+</style>

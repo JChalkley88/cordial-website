@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+
+const title = 'Page not found | Cordial Advisory';
+const description = 'The page you were after is not here.';
+---
+
+<BaseLayout title={title} description={description} theme="light" noIndex={true}>
+  <TopBar />
+
+  <main class="page">
+    <p class="eyebrow">404</p>
+    <h1>This page is not here.</h1>
+    <p class="lead">The page you were after has moved or never existed. Nothing to worry about.</p>
+    <div class="links">
+      <a class="back" href="/">Back to home <span class="arrow">&rarr;</span></a>
+      <a class="back" href="/journal">The Journal <span class="arrow">&rarr;</span></a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(96px, 18vh, 200px) clamp(24px, 5vw, 56px) clamp(72px, 9vw, 120px);
+  }
+  .eyebrow {
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(36px, 6vw, 64px);
+    color: var(--slate);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0;
+    max-width: 16ch;
+  }
+  .lead {
+    font-size: clamp(17px, 1.8vw, 21px);
+    line-height: 1.55;
+    color: var(--body);
+    margin: 22px 0 0;
+    max-width: 48ch;
+  }
+  .links {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: clamp(28px, 4vh, 44px);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .back:hover {
+    opacity: 0.66;
+  }
+  .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .back:hover .arrow {
+    transform: translateX(4px);
+  }
+</style>

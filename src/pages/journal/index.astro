@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopBar from '../../components/TopBar.astro';
+import JournalNewsletter from '../../components/JournalNewsletter.astro';
+import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
+
+const allPosts = await getPublishedPosts();
+const posts = allPosts.slice(0, 3); // the preview shows a selection of recent posts
+// The archive is always one click on from the preview, per the brief.
+const showArchiveLink = allPosts.length > 0;
+
+const title = 'The Journal | Cordial Advisory';
+const description =
+  'What we are seeing inside UK businesses, and what to do about it. Field notes from the work, and the occasional piece from the desk. Short, practical reads for small UK firms.';
+---
+
+<BaseLayout title={title} description={description} theme="light">
+  <TopBar />
+
+  <main class="page">
+    <div class="jhead reveal-up">
+      <p class="eyebrow">The Journal</p>
+      <h1>The <span class="accent-word">Journal.</span></h1>
+      <p class="framing">
+        What we are seeing inside UK businesses, and what to do about it. Field
+        notes from the work, and the occasional piece from the desk.
+      </p>
+    </div>
+
+    {
+      posts.length > 0 ? (
+        <div class="journal-list">
+          {posts.map((post) => (
+            <article class="journal-entry reveal-up">
+              <div class="je-row">
+                <div class="je-inner">
+                  <div class="je-meta">
+                    <span class="je-label">{post.data.type}</span>
+                    <span class="je-date">{formatDate(post.data.date)}</span>
+                  </div>
+                  <a class="je-title-link" href={postPath(post)}>
+                    <h2 class="je-title">{post.data.title}</h2>
+                  </a>
+                  <p class="je-excerpt">{post.data.excerpt}</p>
+                </div>
+                {post.data.image && (
+                  <a class="je-thumb-link" href={postPath(post)} aria-hidden="true" tabindex="-1">
+                    <img class="je-thumb" src={post.data.image} alt="" loading="lazy" />
+                  </a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="empty">The first pieces are on their way. Check back soon.</p>
+      )
+    }
+
+    {
+      showArchiveLink && (
+        <div class="jmore reveal-up">
+          <a class="je-more" href="/journal/archive">
+            More from the Journal <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      )
+    }
+
+    <section class="jnewsletter reveal-up">
+      <JournalNewsletter />
+    </section>
+
+    <footer class="jfoot">
+      <a class="back" href="/"><span class="arrow">&larr;</span> Back to Cordial</a>
+      <span class="foot-mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<script>
+  import '../../scripts/reveal.js';
+</script>
+
+<style>
+  .page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: clamp(40px, 6vw, 72px) clamp(24px, 5vw, 56px) clamp(32px, 5vh, 52px);
+  }
+  .jhead {
+    max-width: 720px;
+    margin-bottom: clamp(20px, 3vh, 38px);
+  }
+  .jhead .eyebrow {
+    margin-bottom: 22px;
+  }
+  .jhead .eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  .jhead h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(34px, 4.6vw, 52px);
+    color: var(--slate);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  .jhead .framing {
+    font-size: clamp(16px, 1.6vw, 19px);
+    line-height: 1.55;
+    color: var(--body);
+    margin-top: 24px;
+    max-width: 600px;
+  }
+  /* compact, tidy list — fits comfortably, not stretched */
+  .journal-entry {
+    padding: clamp(16px, 2.2vh, 26px) 0;
+  }
+  /* All entries share one left edge (override the global alternating indent). */
+  .journal-entry:nth-child(even) .je-inner {
+    margin-left: 0;
+  }
+  /* Thumbnail to the right of the text, matching the archive's image treatment. */
+  .je-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 4vw, 56px);
+    justify-content: space-between;
+  }
+  .je-row .je-inner {
+    flex: 1 1 auto;
+  }
+  .je-thumb-link {
+    flex: none;
+    display: block;
+    line-height: 0;
+  }
+  .je-thumb {
+    width: clamp(128px, 20vw, 208px);
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    filter: saturate(0.86) brightness(0.98);
+    transition: filter 0.28s ease;
+  }
+  .journal-entry:hover .je-thumb {
+    filter: saturate(1) brightness(1);
+  }
+  /* Narrow screens: drop the thumbnail, as the archive does. */
+  @media (max-width: 620px) {
+    .je-thumb-link {
+      display: none;
+    }
+  }
+  .journal-entry .je-title {
+    font-size: clamp(22px, 2.4vw, 30px);
+  }
+  .journal-entry .je-excerpt {
+    font-size: clamp(15px, 1.4vw, 17px);
+    margin-top: 8px;
+  }
+  .empty {
+    padding: clamp(28px, 5vh, 56px) 0;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    color: var(--body);
+    font-size: 18px;
+  }
+  .jmore {
+    margin-top: clamp(22px, 3vh, 36px);
+  }
+  .jnewsletter {
+    margin-top: clamp(56px, 9vh, 110px);
+    padding-top: clamp(34px, 5vh, 56px);
+    border-top: 1px solid var(--hair);
+  }
+  .jfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .back:hover {
+    opacity: 0.66;
+  }
+  .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .back:hover .arrow {
+    transform: translateX(-5px);
+  }
+  .jfoot .foot-mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+</style>

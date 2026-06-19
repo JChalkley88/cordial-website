@@ -1,0 +1,52 @@
+---
+// Persistent top bar for inner pages: burger + wordmark on the left, a
+// "Book a consultation" pill on the right that always routes to the homepage
+// booking section. The homepage has its own theme-switching bar. Journal post
+// pages use the lighter variant (burger = false): wordmark + book pill only.
+import Wordmark from './Wordmark.astro';
+interface Props {
+  burger?: boolean;
+}
+const { burger = true } = Astro.props;
+---
+<header class="topbar is-page">
+  <div class="topbar-left">
+    {
+      burger && (
+        <button
+          class="menu-btn"
+          data-menu-open
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="menu-overlay"
+        >
+          <span />
+          <span />
+        </button>
+      )
+    }
+    <Wordmark href="/" />
+  </div>
+  <a class="btn btn-primary" href="/#book">Book a consultation</a>
+</header>
+
+<style>
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px clamp(24px, 5vw, 64px);
+    position: sticky;
+    top: 0;
+    background: var(--cream-90);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--hair);
+    z-index: 60;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2vw, 22px);
+  }
+</style>

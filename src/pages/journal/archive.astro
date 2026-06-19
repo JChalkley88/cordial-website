@@ -1,0 +1,172 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopBar from '../../components/TopBar.astro';
+import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
+
+const posts = await getPublishedPosts();
+const featured = posts[0];
+const rest = posts.slice(1);
+
+const title = 'The Journal, in full | Cordial Advisory';
+const description =
+  'Every piece from the Cordial Journal, newest first. Field notes from the work and the occasional piece from the desk, for small UK firms.';
+---
+
+<BaseLayout title={title} description={description} theme="light">
+  <TopBar />
+
+  <main class="page">
+    <div class="ahead">
+      <p class="eyebrow">The Journal</p>
+      <h1>Everything, <em>newest first.</em></h1>
+    </div>
+
+    {
+      featured && (
+        <article class="featured">
+          <div class="je-meta">
+            <span class="je-label">{featured.data.type}</span>
+            <span class="je-date">{formatDate(featured.data.date)}</span>
+          </div>
+          <a class="je-title-link" href={postPath(featured)}>
+            <h2 class="ft-title">{featured.data.title}</h2>
+          </a>
+          <p class="ft-excerpt">{featured.data.excerpt}</p>
+          <a class="je-more" href={postPath(featured)}>
+            Read the piece <span class="arrow">&rarr;</span>
+          </a>
+        </article>
+      )
+    }
+
+    {
+      rest.length > 0 && (
+        <div class="notes">
+          {rest.map((post, i) => (
+            <a class:list={['note-row', !post.data.image && 'note-row--noimg']} href={postPath(post)}>
+              <span class="nr-num">{String(i + 1).padStart(2, '0')}</span>
+              {post.data.image && (
+                <img class="nr-thumb" src={post.data.image} alt="" loading="lazy" />
+              )}
+              <div class="nr-main">
+                <div class="nr-title">{post.data.title}</div>
+                <div class="nr-byline">
+                  <span class="who">{post.data.author}</span> &middot; {formatDate(post.data.date)} &middot; {post.data.type}
+                </div>
+              </div>
+              <span class="nr-go" aria-hidden="true">&rarr;</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+
+    <footer class="jfoot">
+      <a class="back" href="/journal"><span class="arrow">&larr;</span> Back to the Journal</a>
+      <span class="foot-mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: clamp(40px, 6vw, 72px) clamp(24px, 5vw, 56px) clamp(32px, 5vh, 52px);
+  }
+  .ahead {
+    max-width: 760px;
+    margin-bottom: clamp(28px, 4vh, 48px);
+  }
+  .ahead .eyebrow {
+    margin-bottom: 22px;
+  }
+  .ahead .eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  .ahead h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(34px, 5vw, 56px);
+    color: var(--slate);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  .ahead h1 em {
+    font-style: italic;
+  }
+  /* featured most-recent post */
+  .featured {
+    padding: clamp(20px, 3vh, 34px) 0 clamp(26px, 4vh, 44px);
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: clamp(28px, 4vh, 48px);
+  }
+  .featured .ft-title {
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.07;
+    letter-spacing: -0.022em;
+    color: var(--slate);
+    max-width: 18ch;
+    text-wrap: balance;
+    margin: 0;
+    transition: color 0.25s ease;
+  }
+  .featured .je-title-link:hover .ft-title {
+    color: var(--aubergine);
+  }
+  .featured .ft-excerpt {
+    font-size: clamp(16px, 1.7vw, 20px);
+    line-height: 1.55;
+    color: var(--body);
+    max-width: 56ch;
+    margin: 14px 0 20px;
+  }
+  /* no-image note rows drop the thumbnail column */
+  .note-row--noimg {
+    grid-template-columns: auto 1fr auto;
+  }
+  .nr-byline {
+    text-transform: none;
+  }
+  .jfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .back:hover {
+    opacity: 0.66;
+  }
+  .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .back:hover .arrow {
+    transform: translateX(-5px);
+  }
+  .jfoot .foot-mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+</style>

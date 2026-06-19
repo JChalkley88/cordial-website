@@ -1,0 +1,80 @@
+---
+// The calm full-screen burger overlay, used on every page. The burger button
+// itself lives in the top bar (with data-menu-open); this is the panel it opens.
+import Wordmark from './Wordmark.astro';
+import { NAV, SITE } from '../lib/site';
+---
+<nav class="menu-overlay" id="menu-overlay" aria-hidden="true" aria-label="Main menu">
+  <div class="menu-head">
+    <Wordmark href="/" home={true} />
+    <button class="menu-close" data-menu-close aria-label="Close menu"></button>
+  </div>
+  <div class="menu-nav">
+    {
+      NAV.map((item) => (
+        <a class="menu-link" href={item.href}>
+          <span class="idx">{item.idx}</span>
+          {item.label}
+        </a>
+      ))
+    }
+  </div>
+  <div class="menu-foot">
+    <span>{SITE.locality}, {SITE.region}</span>
+    <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+  </div>
+</nav>
+
+<script>
+  // Burger menu: calm open/close, focus-safe, Escape to close.
+  (function () {
+    const btn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+    const overlay = document.getElementById('menu-overlay');
+    if (!btn || !overlay) return;
+    const closeBtn = overlay.querySelector<HTMLButtonElement>('[data-menu-close]');
+    let lastFocus: HTMLElement | null = null;
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+      }
+    }
+    function open() {
+      lastFocus = document.activeElement as HTMLElement;
+      overlay!.classList.add('open');
+      document.body.classList.add('menu-open');
+      btn!.setAttribute('aria-expanded', 'true');
+      overlay!.setAttribute('aria-hidden', 'false');
+      setTimeout(() => closeBtn && closeBtn.focus(), 80);
+      document.addEventListener('keydown', onKey, true);
+    }
+    function close() {
+      overlay!.classList.remove('open');
+      document.body.classList.remove('menu-open');
+      btn!.setAttribute('aria-expanded', 'false');
+      overlay!.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', onKey, true);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    btn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    // Real navigations: let the link proceed, just begin closing the overlay.
+    // The wordmark (data-home) returns to the top of the homepage and must never
+    // replay the opening intro, so mark it seen before navigating. On the
+    // homepage the ribbon engine also intercepts data-home to glide to the top.
+    overlay.querySelectorAll('a[href]').forEach((a) => {
+      a.addEventListener('click', () => {
+        if (a.hasAttribute('data-home')) {
+          try {
+            localStorage.setItem('cordial_intro_seen_v1', '1');
+          } catch (e) {
+            /* storage unavailable: navigation still proceeds */
+          }
+        }
+        close();
+      });
+    });
+  })();
+</script>

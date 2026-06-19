@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+
+const title = 'FAQs | Cordial Advisory';
+const description =
+  'A few things we get asked about working with Cordial Advisory: what it is, what it costs, commitment, existing tools, and where we are based.';
+
+// One source of truth for the accordion and the FAQPage structured data.
+const faqs = [
+  {
+    q: 'Is this AI consulting or business consulting?',
+    a: 'Business consulting, mostly. We use AI where it genuinely helps, but most of what we recommend is not AI at all. It is process, sequencing, and removing things that should not be there in the first place.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'The audit is a fixed price. The work that follows is priced once we know what it involves, written down and agreed before we begin. No open-ended day rates, no meter running, no invoice you did not see coming.',
+  },
+  {
+    q: 'Do we have to commit to anything after the audit?',
+    a: 'No. The audit stands on its own. Some clients go on to implementation; others take the plan and run it themselves, which is also fine.',
+  },
+  {
+    q: 'What if we already use AI tools?',
+    a: 'Most businesses do. The interesting question is whether the tools are doing useful work or just sitting in a tab. We often spend more time removing tools than adding them.',
+  },
+  {
+    q: 'Where are you based, and do you travel?',
+    a: 'Wantage, Oxfordshire. Audit days happen at your premises, wherever in the UK that is. Travel is included in the audit price.',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} theme="light" jsonLd={faqLd}>
+  <TopBar />
+
+  <main class="page">
+    <div class="qhead reveal-up">
+      <p class="eyebrow">FAQs</p>
+      <h1>A few things we get <span class="accent-word">asked.</span></h1>
+    </div>
+
+    <div class="qlist">
+      {
+        faqs.map((f) => (
+          <section class="qitem reveal-up">
+            <button class="q" aria-expanded="false">
+              <h2>{f.q}</h2>
+              <span class="pm" aria-hidden="true" />
+            </button>
+            <div class="a">
+              <p>{f.a}</p>
+            </div>
+          </section>
+        ))
+      }
+    </div>
+
+    <footer class="qfoot">
+      <a class="back" href="/contact">Still have a question? Get in touch <span class="arrow">&rarr;</span></a>
+      <span class="mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<script>
+  import '../scripts/reveal.js';
+
+  // Accordion: closed by default; each panel animates max-height open/closed.
+  document.querySelectorAll<HTMLButtonElement>('.qitem .q').forEach((btn) => {
+    const item = btn.closest('.qitem');
+    const panel = item?.querySelector<HTMLElement>('.a');
+    if (!item || !panel) return;
+    btn.addEventListener('click', () => {
+      const open = item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.style.maxHeight = open ? `${panel.scrollHeight}px` : '0px';
+    });
+  });
+</script>
+
+<style>
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: clamp(56px, 9vw, 112px) clamp(24px, 5vw, 56px) clamp(72px, 9vw, 120px);
+  }
+  .qhead {
+    margin-bottom: clamp(40px, 6vh, 72px);
+  }
+  .qhead .eyebrow {
+    margin-bottom: 22px;
+  }
+  .qhead .eyebrow::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  .qhead h1 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6.4vw, 74px);
+    color: var(--slate);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin: 0;
+    max-width: 16ch;
+  }
+  .qitem {
+    border-top: 1px solid var(--hair);
+  }
+  .qitem:last-of-type {
+    border-bottom: 1px solid var(--hair);
+  }
+  .qitem .q {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: clamp(15px, 2.1vh, 22px) 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .qitem .q h2 {
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: clamp(18px, 1.9vw, 23px);
+    color: var(--slate);
+    letter-spacing: -0.015em;
+    margin: 0;
+    max-width: 26ch;
+    transition: color 0.25s ease;
+  }
+  .qitem .q:hover h2 {
+    color: var(--aubergine);
+  }
+  .qitem .pm {
+    position: relative;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 6px;
+  }
+  .qitem .pm::before,
+  .qitem .pm::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 18px;
+    height: 1.5px;
+    background: var(--slate);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .qitem .pm::after {
+    transform: rotate(90deg);
+  }
+  .qitem.open .pm::after {
+    transform: rotate(0);
+  }
+  .qitem .a {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .qitem .a p {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.6;
+    color: var(--body);
+    margin: 0 0 clamp(18px, 2.5vh, 26px);
+    max-width: 64ch;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qitem .a {
+      transition: none;
+    }
+    .qitem .pm::before,
+    .qitem .pm::after {
+      transition: none;
+    }
+  }
+  .qfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .qfoot .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .qfoot .back:hover {
+    opacity: 0.66;
+  }
+  .qfoot .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .qfoot .back:hover .arrow {
+    transform: translateX(5px);
+  }
+  .qfoot .mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+</style>
