@@ -27,6 +27,5 @@ export const NAV = [
 ] as const;
 
 export const SOCIAL = {
-  linkedin: '#',
-  x: '#',
+  linkedin: 'https://www.linkedin.com/company/cordial-advisory',
 } as const;
