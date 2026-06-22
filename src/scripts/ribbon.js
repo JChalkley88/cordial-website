@@ -429,16 +429,26 @@
   } else {
     // First arrival: remember it now so a refresh mid-intro never replays it.
     try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) {}
-    ['wheel', 'pointerdown', 'keydown', 'touchstart'].forEach(function (ev) {
+    // Skip on any interaction (click / tap / scroll / key) anywhere on the
+    // intro veil. Every route runs the same openIntro() teardown; once one
+    // fires we remove all the listeners so none linger past the intro.
+    var skipEvents = ['wheel', 'pointerdown', 'keydown', 'touchstart'];
+    var removeSkip = function () {
+      skipEvents.forEach(function (ev) { window.removeEventListener(ev, onSkip, { capture: true }); });
+    };
+    var onSkip = function (e) {
+      if (!introActive) return;
+      e.stopPropagation();
+      if (e.type === 'wheel' || e.type === 'touchstart') { try { e.preventDefault(); } catch (x) {} }
+      removeSkip();
+      openIntro();
+    };
+    skipEvents.forEach(function (ev) {
       var pv = (ev === 'wheel' || ev === 'touchstart');
-      window.addEventListener(ev, function (e) {
-        if (!introActive) return;
-        e.stopPropagation();
-        if (pv) { try { e.preventDefault(); } catch (x) {} }
-        openIntro();
-      }, { capture: true, passive: !pv });
+      window.addEventListener(ev, onSkip, { capture: true, passive: !pv });
     });
-    setTimeout(openIntro, reduce() ? 500 : 2400);
+    // Natural finish: hold ~1s longer than before, then run the same teardown.
+    setTimeout(function () { removeSkip(); openIntro(); }, reduce() ? 500 : 3400);
   }
 
   /* arriving from another page via the menu's "What we do": skip the intro and
