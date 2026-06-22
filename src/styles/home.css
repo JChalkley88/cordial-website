@@ -433,7 +433,8 @@
     #p5 .ja-form { max-width: none; }
     #p5 .je-top { grid-template-columns: 1fr !important; }
     #p5 .je-top-right { padding-top: 26px !important; }
-    .break-line { opacity: 1 !important; }
+    .break-line { opacity: 1 !important; max-width: none; font-size: clamp(27px, 7vw, 40px); text-wrap: balance; }
+    .break-line span { display: inline; }
     .wwd-item::before, .wwd-item:last-child::after { transform: scaleX(1) !important; }
     .steps, .founders, .who-grid, .book-grid { grid-template-columns: 1fr; }
     .wwd-item, .hiw-step { margin-left: 0 !important; max-width: none !important; opacity: 1 !important; transform: none !important; }
