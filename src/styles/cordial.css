@@ -75,7 +75,7 @@ a { color: inherit; }
 /* ---------- Eyebrow ---------- */
 .eyebrow {
   font-family: 'Source Sans 3', sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -499,7 +499,7 @@ body.menu-open { overflow: hidden; }
    ============================================================ */
 .gt-section { width: 100%; }
 .gt-eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
+  font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600;
   letter-spacing: 0.03em; text-transform: uppercase; color: var(--slate); }
 .gt-eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--aubergine); flex: none; }
 .gt-h2 { font-family: 'Karla', sans-serif; font-size: clamp(32px, 4vw, 50px); font-weight: 400;
