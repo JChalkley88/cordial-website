@@ -6,17 +6,17 @@ date: 2026-06-18
 slug: "software-we-paid-for-but-do-not-use"
 titleTag: "Software we paid for but do not use: how to audit it | Cordial Advisory"
 metaDescription: "Most small businesses are paying for software nobody opens. A simple way to audit what you are using, and a calm way to decide what to do about it."
-excerpt: "Every business I have worked in has the same quiet problem: software we paid for but do not use, and nobody is quite sure how much of it there is."
+excerpt: "Most small businesses have the same quiet problem: software they pay for but do not use, and nobody is quite sure how much of it there is."
 image: "https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/software-we-paid-for-but-do-not-use.png"
 ---
 
-Every business I have worked in has had the same quiet problem. There is software we paid for but do not use, and nobody is quite sure how much of it there is.
+Most small businesses have the same quiet problem. There is software they are paying for but do not use, and nobody is quite sure how much of it there is.
 
 It accumulates the way these things always do. Someone bought a tool eighteen months ago to solve a real problem. It worked for a while. The person who championed it left, or moved roles, or the problem changed shape. The tool kept billing. Nobody noticed, because the direct debit is small enough to slide past the monthly review, and large enough to add up across twenty of them.
 
-When I ran the commercial side of a thirty-five person business in my last role, I went through this exercise properly for the first time. The answer surprised me. A meaningful slice of the software bill, somewhere between fifteen and forty per cent depending on how strictly you count, was going on tools nobody had opened in months. That is not a number I can promise applies to every business, but it has matched what I have seen when I have asked other founders to do the same exercise quietly.
+I spent a long stretch of my career on the inside of businesses like this. The pattern is consistent across every one I have worked in. A meaningful slice of the software bill, somewhere between fifteen and forty per cent depending on how strictly you count, is usually going on tools nobody has opened in months. That is not a number I can promise applies to every business. But it is enough that the bill is worth a proper look.
 
-This is not anyone's fault. Software has become very easy to buy and very hard to inventory. The cost of any individual tool is small. The cost of the pile is meaningful, but it is the kind of cost that does not show up as a single line on a P\&L. It hides in eighteen direct debits of fifteen to ninety pounds each, signed off by different people, billed to different cards.
+This is not anyone's fault. Software has become very easy to buy and very hard to inventory. The cost of any individual tool is small. The cost of the pile is meaningful, but it is the kind of cost that does not show up as a single line on a P&L. It hides in eighteen direct debits of fifteen to ninety pounds each, signed off by different people, billed to different cards.
 
 ## Why this is bigger than the money
 
@@ -58,15 +58,15 @@ The same principle applies to features inside tools you are definitely keeping. 
 
 ## What it does beyond the saving
 
-The first time I did this properly, in my last role, the saving was real but not the part that surprised me.
+The interesting part of doing this properly is not the money saved. It is what happens next.
 
-The bigger thing was what it did to the team. The act of going through the stack and being honest about what was actually working made it much easier, in the months that followed, to be honest about other things. A few processes got similar treatment. So did some meetings. The discipline of asking what was earning its place, rather than letting things continue by default, became something the business could do for itself.
+The act of going through the stack and being honest about what is actually working makes it easier, in the months that follow, to be honest about other things. A few processes get similar treatment. So do some meetings. The discipline of asking what is earning its place, rather than letting things continue by default, becomes something the business does for itself.
 
 That is the part most consultants will not write about, because the saving on cancelled software is too small to send a proposal about. But the saving is not really the point. The point is the habit underneath it. A business that knows what its tools are for is a business that knows what its work is for, and those are not coincidences.
 
 So here is the test, if you want one. Open the bank statements for the last three months. Write down every software direct debit. Ask the three questions about each one. Be honest, especially about the middle pile, and give yourself the time to find out before you cancel anything.
 
-Most businesses I know who have done this end up with a quieter stack, a clearer team, and a habit they did not have before. The money is the smallest of the three.
+Most businesses that do this end up with a quieter stack, a clearer team, and a habit they did not have before. The money is the smallest of the three.
 
 If you want a second pair of eyes on what your stack is doing and what could come out of it, that is part of what an audit covers. Either way, I write something like this most weeks. You are welcome to follow along.
 
