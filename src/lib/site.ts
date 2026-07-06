@@ -10,7 +10,7 @@ export const SITE = {
   locality: 'Wantage',
   region: 'Oxfordshire',
   country: 'GB',
-  email: 'jack@cordialadvisory.co.uk',
+  email: 'hello@cordialadvisory.co.uk',
 } as const;
 
 // Microsoft Bookings link for the consultation calendar. The booking flow is
