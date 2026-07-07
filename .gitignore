@@ -14,6 +14,9 @@ node_modules/
 # documented design handoff — reference only, must never ship
 design-reference/
 
+# local draft working files — kept on disk, never tracked
+drafts/
+
 # logs and os files
 npm-debug.log*
 .DS_Store
