@@ -1,8 +1,8 @@
 ---
 // Persistent top bar for inner pages: burger + wordmark on the left, a
-// "Book a consultation" pill on the right that always routes to the homepage
-// booking section. The homepage has its own theme-switching bar. Journal post
-// pages use the lighter variant (burger = false): wordmark + book pill only.
+// "Let's talk" pill on the right that always routes to the homepage contact
+// section. The homepage has its own theme-switching bar. Journal post pages
+// use the lighter variant (burger = false): wordmark + the pill only.
 import Wordmark from './Wordmark.astro';
 interface Props {
   burger?: boolean;
@@ -27,7 +27,7 @@ const { burger = true } = Astro.props;
     }
     <Wordmark href="/" />
   </div>
-  <a class="btn btn-primary" href="/#book">Book a consultation</a>
+  <a class="btn btn-primary" href="/#book">Let's talk</a>
 </header>
 
 <style>

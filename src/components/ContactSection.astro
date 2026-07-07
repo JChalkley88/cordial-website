@@ -1,11 +1,9 @@
 ---
-// The single shared "Get in touch" section. One form, one handler, one leads
-// destination. Two modes:
-//   full  (homepage)  — booking calendar + consultation framing + the form
-//   calm  (contact)   — the same form only, no calendar, no consultation copy
+// The single shared "Get in touch" section. One invitation, one form, one
+// handler, one leads destination. Used on the homepage and the calm Get in
+// touch page; the two are identical now, differing only in the anchor id so
+// the top-bar and cover buttons can still land on #book.
 // Styling lives once in cordial.css (.gt-*). The form posts to /api/contact.
-import { BOOKING_URL } from '../lib/site';
-
 interface Props {
   mode?: 'full' | 'calm';
 }
@@ -24,48 +22,20 @@ const HEAR_OPTS = [
 ];
 ---
 <section
-  class:list={['gt-section', calm && 'gt-section--calm']}
+  class="gt-section"
   id={calm ? 'contact' : 'book'}
   aria-labelledby="gt-h2"
 >
   <!-- Label wrapped in one inline unit so the flex `gap` sits only between the
        leading dash and the text, never between the words themselves. -->
   <p class="gt-eyebrow"><span class="gt-eyebrow-label">Get in <span class="accent-word">touch</span></span></p>
-  {
-    calm ? (
-      <Fragment>
-        <h2 class="gt-h2" id="gt-h2">Get in touch</h2>
-        <p class="gt-lede">
-          Drop us a line. Tell us a little about your business and what you are
-          wrestling with, and we will come back to you.
-        </p>
-      </Fragment>
-    ) : (
-      <Fragment>
-        <h2 class="gt-h2" id="gt-h2">Book a consultation.</h2>
-        <p class="gt-lede">
-          Forty five minutes by video. We talk about your business, what has felt
-          heavy, and whether the work we do is a <span class="accent-word">fit</span>.
-          If it is not, we say so.
-        </p>
-      </Fragment>
-    )
-  }
+  <h2 class="gt-h2" id="gt-h2">Let's talk it through.</h2>
+  <p class="gt-lede">
+    A free conversation to understand what is feeling heavy in your business,
+    and whether we can be of use. No pressure, no pitch.
+  </p>
 
-  <div class:list={['gt-grid', calm && 'gt-grid--single']}>
-    {!calm && (
-      <div class="gt-booking">
-        <div class="gt-calendar" data-calendar>
-          <noscript>
-            <p class="gt-cal-meta" style="padding: 20px;">
-              To book a 45 minute consultation by video, visit
-              <a href={BOOKING_URL} target="_blank" rel="noopener">our booking calendar</a>.
-            </p>
-          </noscript>
-        </div>
-      </div>
-    )}
-
+  <div class="gt-formwrap">
     <form class="gt-form" novalidate data-contact-form>
       <div class="gt-fields">
         <div class="gt-field">
@@ -133,59 +103,9 @@ const HEAR_OPTS = [
   </div>
 </section>
 
-<script define:vars={{ BOOKING_URL }}>
+<script is:inline>
   (function () {
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-    function openBooking() { window.open(BOOKING_URL, '_blank', 'noopener'); }
-
-    // A calm month grid. Weekdays from today open the external booking flow;
-    // weekends and past dates are muted. This is a link-out, not the CRM.
-    function buildCalendar(el) {
-      if (!el) return;
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      let view = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      function render() {
-        const y = view.getFullYear(), m = view.getMonth();
-        const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const atMin = (y === today.getFullYear() && m === today.getMonth());
-
-        let h = '';
-        h += '<div class="gt-cal-head"><span class="gt-cal-title">' + MONTHS[m] + ' ' + y + '</span>' +
-          '<span class="gt-cal-nav">' +
-            '<button type="button" data-prev aria-label="Previous month"' + (atMin ? ' disabled' : '') + '>‹</button>' +
-            '<button type="button" data-next aria-label="Next month">›</button>' +
-          '</span></div>';
-        h += '<div class="gt-cal-grid">';
-        DOW.forEach((d) => { h += '<span class="gt-cal-dow">' + d + '</span>'; });
-        for (let i = 0; i < firstDow; i++) h += '<span class="gt-cal-day empty"></span>';
-        for (let d = 1; d <= daysInMonth; d++) {
-          const date = new Date(y, m, d);
-          const dow = date.getDay();
-          const weekend = (dow === 0 || dow === 6);
-          const past = date < today;
-          const isToday = date.getTime() === today.getTime();
-          const avail = !past && !weekend;
-          const cls = 'gt-cal-day' + (isToday ? ' today' : '') + (avail ? ' avail' : ' muted');
-          h += '<button type="button" class="' + cls + '"' + (avail ? ' data-book' : ' disabled tabindex="-1"') + '>' + d + '</button>';
-        }
-        h += '</div>';
-        h += '<div class="gt-cal-foot"><span class="gt-cal-meta">45 minutes · by video</span>' +
-          '<a class="btn btn-primary gt-cal-cta" href="' + BOOKING_URL + '" target="_blank" rel="noopener">Choose a time →</a></div>';
-        el.innerHTML = h;
-
-        const prev = el.querySelector('[data-prev]'), next = el.querySelector('[data-next]');
-        if (prev && !prev.disabled) prev.addEventListener('click', () => { view = new Date(y, m - 1, 1); render(); });
-        if (next) next.addEventListener('click', () => { view = new Date(y, m + 1, 1); render(); });
-        el.querySelectorAll('[data-book]').forEach((b) => b.addEventListener('click', openBooking));
-      }
-      render();
-    }
 
     // Brand-styled "How did you hear about us?" dropdown. Mirrors the chosen
     // CRM value into the hidden #gt-hear input so the handler reads it like any field.
@@ -300,7 +220,6 @@ const HEAR_OPTS = [
     document.querySelectorAll('.gt-section').forEach((scope) => {
       wireForm(scope.querySelector('.gt-form'));
       wireSelect(scope);
-      buildCalendar(scope.querySelector('[data-calendar]'));
       lightAccents(scope);
     });
   })();
