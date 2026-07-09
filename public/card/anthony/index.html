@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anthony Pothecary · Cordial Advisory</title>
+<meta name="description" content="Anthony Pothecary, Co-founder, Cordial Advisory. Save my contact details.">
+<!--
+  REPLACE before live: tel_display / tel_vcard, linkedin, role, confirm email.
+  The embedded QR points at https://cordialadvisory.co.uk/card/anthony - it only
+  works once this page is live at that address. Update the page anytime; the QR stays the same.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#F2EBDC; --slate:#2D4A5C; --aubergine:#5C3349;
+    --ink:#1F2937; --body:#4A5560;
+    --hairline:rgba(45,74,92,0.16); --tint:rgba(45,74,92,0.06);
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    background:var(--cream); color:var(--body);
+    font-family:"Source Sans 3", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    min-height:100dvh; display:flex; align-items:flex-start; justify-content:center;
+    padding:56px 24px calc(40px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  .card { width:100%; max-width:400px; }
+  .brand { margin-bottom:52px; }
+  .wordmark { font-family:"Karla",sans-serif; font-weight:600; font-size:30px; letter-spacing:-0.4px; color:var(--slate); line-height:1; }
+  .descriptor { font-weight:600; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-top:8px; }
+  .name { font-family:"Karla",sans-serif; font-weight:500; font-size:27px; color:var(--ink); line-height:1.1; margin:0; }
+  .role { font-size:15px; color:var(--body); margin-top:6px; }
+  .accent { width:44px; height:2px; background:var(--aubergine); border:0; margin:22px 0 30px; }
+  .save {
+    display:block; width:100%; background:var(--slate); color:var(--cream);
+    font-family:"Source Sans 3",sans-serif; font-weight:600; font-size:16px; letter-spacing:0.2px;
+    border:0; border-radius:4px; padding:15px 18px; cursor:pointer; text-align:center; transition:opacity .15s ease;
+  }
+  .save:active { opacity:0.82; }
+  .save:focus-visible { outline:2px solid var(--aubergine); outline-offset:3px; }
+  .qrtoggle {
+    display:block; width:100%; margin-top:14px; background:none; border:0; cursor:pointer;
+    font-family:"Source Sans 3",sans-serif; font-weight:600; font-size:14px; color:var(--slate);
+    text-align:center; padding:6px; text-decoration:underline; text-underline-offset:4px;
+  }
+  .qrtoggle:focus-visible { outline:2px solid var(--aubergine); outline-offset:3px; border-radius:2px; }
+  .qrpanel { display:none; margin-top:18px; text-align:center; }
+  .qrpanel.open { display:block; }
+  .qrpanel img { width:220px; height:220px; image-rendering:pixelated; border:1px solid var(--hairline); border-radius:6px; }
+  .qrcaption { font-size:12px; letter-spacing:0.3px; color:var(--body); margin-top:12px; }
+  .actions { margin-top:20px; }
+  .row {
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    padding:15px 4px; border-top:1px solid var(--hairline); color:var(--slate);
+    text-decoration:none; transition:background .12s ease;
+  }
+  .actions .row:last-child { border-bottom:1px solid var(--hairline); }
+  .row:active { background:var(--tint); }
+  .row:focus-visible { outline:2px solid var(--aubergine); outline-offset:-2px; border-radius:2px; }
+  .row .label { font-weight:600; font-size:15px; color:var(--slate); }
+  .row .value { font-size:14px; color:var(--body); text-align:right; word-break:break-word; }
+  .foot { margin-top:40px; font-size:11px; letter-spacing:0.3px; color:var(--body); opacity:0.8; }
+  .foot a { color:inherit; text-decoration:none; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <div class="wordmark">Cordial</div>
+      <div class="descriptor">Advisory</div>
+    </div>
+
+    <h1 class="name">Anthony Pothecary</h1>
+    <div class="role">Co-founder</div>
+    <hr class="accent">
+
+    <button class="save" id="save" type="button">Save to contacts</button>
+    <button class="qrtoggle" id="qrtoggle" type="button" aria-expanded="false" aria-controls="qrpanel">Show QR code</button>
+
+    <div class="qrpanel" id="qrpanel">
+      <img src="data:image/png;base64,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" alt="QR code linking to Anthony Pothecary's contact card" width="220" height="220">
+      <div class="qrcaption">Point a phone camera here to open my card.</div>
+    </div>
+
+    <nav class="actions">
+      <a class="row" href="tel:+447828153079"><span class="label">Call</span><span class="value">07828 153079</span></a>
+      <a class="row" href="mailto:anthony@cordialadvisory.co.uk"><span class="label">Email</span><span class="value">anthony@cordialadvisory.co.uk</span></a>
+      <a class="row" href="https://www.linkedin.com/in/anthony-pothecary-5b0b7389/" target="_blank" rel="noopener"><span class="label">LinkedIn</span><span class="value">View profile</span></a>
+      <a class="row" href="https://cordialadvisory.co.uk"><span class="label">Book a consultation</span><span class="value">cordialadvisory.co.uk</span></a>
+    </nav>
+
+    <div class="foot">Cordial Advisory · Wantage, Oxfordshire<br><a href="https://cordialadvisory.co.uk">cordialadvisory.co.uk</a></div>
+  </main>
+
+<script>
+  document.getElementById('save').addEventListener('click', function () {
+    var v = ['BEGIN:VCARD','VERSION:3.0','N:Pothecary;Anthony;;;','FN:Anthony Pothecary',
+      'ORG:Cordial Advisory','TITLE:Co-founder','TEL;TYPE=CELL:+447828153079',
+      'EMAIL;TYPE=WORK:anthony@cordialadvisory.co.uk','URL:https://cordialadvisory.co.uk',
+      'ADR;TYPE=WORK:;;;Wantage;Oxfordshire;;United Kingdom','END:VCARD'].join('\r\n');
+    var blob = new Blob([v], { type: 'text/vcard;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Anthony-Pothecary.vcf';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  });
+  (function () {
+    var t = document.getElementById('qrtoggle'), p = document.getElementById('qrpanel');
+    t.addEventListener('click', function () {
+      var open = p.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+      t.textContent = open ? 'Hide QR code' : 'Show QR code';
+    });
+  })();
+</script>
+</body>
+</html>
