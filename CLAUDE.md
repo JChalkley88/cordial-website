@@ -90,11 +90,11 @@
 
 # 
 
-# \## Journal frontmatter (nine fields)
+# \## Journal frontmatter (nine required fields, plus optional subtitle)
 
 # 
 
-# title, type ("Field notes" | "From the desk"), author ("Jack Chalkley" | "Anthony Pothecary"), date (YYYY-MM-DD), slug, titleTag, metaDescription (max 155), excerpt, image (hosted URL, may be ""). Optional draft (boolean, default false) excludes a post from the preview, archive, post pages and RSS. type and author are string-literal unions so a typo fails the build. Strip any trailing "## Suggested internal links" section before rendering. Posts are pasted in by hand today; both Journal pages update automatically from the content collection (newest first).
+# title, type ("Field notes" | "From the desk"), author ("Jack Chalkley" | "Anthony Pothecary"), date (YYYY-MM-DD), slug, titleTag, metaDescription (max 155), excerpt, image (hosted URL, may be ""). Optional subtitle (string, max 200, trimmed): a pull-quote subheading written by the marketing app's extractor; renders below the title on the post page only, never on the listing cards; posts without one render exactly as before. Optional draft (boolean, default false) excludes a post from the preview, archive, post pages and RSS. type and author are string-literal unions so a typo fails the build. Strip any trailing "## Suggested internal links" section before rendering. Posts are pasted in by hand today; both Journal pages update automatically from the content collection (newest first).
 
 # 
 

@@ -16,6 +16,9 @@ const journal = defineCollection({
     titleTag: z.string(),
     // Contract is 155 chars; the marketing tool guarantees it never exceeds.
     metaDescription: z.string().max(155),
+    // Optional pull-quote subtitle, written by the marketing app's extractor.
+    // Short and snappy by contract; anything longer belongs in the body.
+    subtitle: z.string().trim().max(200).optional(),
     excerpt: z.string(),
     // Hosted thumbnail URL. Empty string means no image.
     image: z.string().optional().default(''),

@@ -18,6 +18,9 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 
 const { data } = entry;
+// metaDescription is required by the schema, so the subtitle branch only
+// becomes live if that contract is ever relaxed.
+const description = data.metaDescription || data.subtitle || '';
 const isoDate = data.date.toISOString().slice(0, 10);
 const url = new URL(postPath(entry), SITE.url).href;
 
@@ -30,7 +33,7 @@ const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: data.title,
-  description: data.metaDescription,
+  ...(description ? { description } : {}),
   author: { '@type': 'Person', name: data.author },
   publisher: {
     '@type': 'Organization',
@@ -52,7 +55,7 @@ const articleLd = {
 
 <BaseLayout
   title={`${data.titleTag} | Cordial Advisory`}
-  description={data.metaDescription}
+  description={description}
   theme="light"
   ogType="article"
   ogImage={data.image || undefined}
@@ -65,6 +68,7 @@ const articleLd = {
     <div class="article-head reveal-up">
       <span class="je-label article-label">{data.type}</span>
       <h1>{data.title}</h1>
+      {data.subtitle && <p class="subtitle">{data.subtitle}</p>}
       <p class="byline">
         <span class="who">{data.author}</span> &middot; {formatDate(data.date)} &middot; {readingTime(entry.body)}
       </p>
@@ -112,6 +116,15 @@ const articleLd = {
     margin-top: 18px;
     line-height: 1.05;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-family: 'Karla', sans-serif;
+    font-weight: 400;
+    font-size: clamp(19px, 2.6vw, 24px);
+    line-height: 1.35;
+    color: var(--body);
+    margin-top: 16px;
     text-wrap: balance;
   }
   .byline {
