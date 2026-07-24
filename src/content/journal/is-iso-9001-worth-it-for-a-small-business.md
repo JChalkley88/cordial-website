@@ -8,6 +8,7 @@ titleTag: "Is ISO 9001 worth it for a small business? | Cordial Advisory"
 metaDescription: "An honest answer on whether ISO 9001 is worth it for a small business: when it pays back, when it is overkill, and the lighter version that helps."
 excerpt: "Sooner or later someone tells you that you need ISO 9001. Whether it is worth it depends on what you are buying it for, and there are only three good reasons."
 image: "https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/is-iso-9001-worth-it-for-a-small-business.png"
+readinessCheck: true
 ---
 
 If you run a small business that makes things, sooner or later someone will tell you that you need ISO 9001. It might be a customer asking whether you have it. It might be a tender document treating it as a tick-box. It might be a consultant offering to certify you in twelve weeks for a fixed fee. Whoever it is, the question lands and you have to decide what to do about it.

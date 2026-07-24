@@ -11,6 +11,9 @@ import {
 // opt-in is never lost and the bearer tokens never reach the browser.
 
 export const SOURCE = 'website-contact-form';
+// The ISO 9001 readiness check is a separate funnel from contact enquiries, so
+// it carries its own source into both the CRM and the marketing app.
+export const READINESS_SOURCE = 'website-iso-readiness-check';
 const FROM = 'Cordial Website <website@cordialadvisory.co.uk>';
 
 export type NewsletterOutcome =
@@ -52,6 +55,34 @@ export async function sendFallbackEmail(subject: string, lines: string[]): Promi
     });
   } catch (err) {
     console.error('[website] Resend fallback failed:', err);
+  }
+}
+
+// Send an HTML email to a visitor-supplied address, from the same identity and
+// the same Resend key as the fallback. Used for the readiness results, which
+// the visitor has asked us to send them. Throws on failure so the caller can
+// fall back rather than silently drop it.
+export async function sendHtmlEmail(options: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+}): Promise<void> {
+  if (!RESEND_API_KEY) {
+    throw new Error('no RESEND_API_KEY');
+  }
+  const resend = new Resend(RESEND_API_KEY);
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: options.to,
+    subject: options.subject,
+    html: options.html,
+    text: options.text,
+    replyTo: options.replyTo,
+  });
+  if (error) {
+    throw new Error(`Resend rejected: ${error.message || 'unknown error'}`);
   }
 }
 

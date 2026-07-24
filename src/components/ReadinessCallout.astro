@@ -1,0 +1,76 @@
+---
+// A quiet in-post link to the ISO 9001 readiness check. Hairlines, no box, one
+// aubergine moment on the leading rule. Rendered inside a Journal post body,
+// so it sits at the prose measure rather than the full page width.
+---
+<aside class="rcc">
+  <p class="rcc-eyebrow">ISO 9001 readiness check</p>
+  <p class="rcc-line">
+    Fifteen yes-or-no questions on how you run the work already. You get a score, a band, and a
+    written breakdown of where your gaps are and what to do first.
+  </p>
+  <a class="rcc-go" href="/iso-readiness-check">Take the readiness check <span class="arrow">&rarr;</span></a>
+</aside>
+
+<style>
+  .rcc {
+    max-width: var(--read);
+    margin: clamp(36px, 5vh, 56px) auto;
+    padding-top: 26px;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    padding-bottom: 26px;
+  }
+  .rcc-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin: 0 0 14px;
+  }
+  .rcc-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--aubergine);
+    flex: none;
+  }
+  .rcc-line {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--body);
+    margin: 0 0 18px;
+    max-width: 56ch;
+  }
+  .rcc-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .rcc-go:hover {
+    opacity: 0.66;
+  }
+  .rcc-go .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .rcc-go:hover .arrow {
+    transform: translateX(5px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rcc-go .arrow {
+      transition: none;
+    }
+  }
+</style>

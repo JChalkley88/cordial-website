@@ -472,6 +472,7 @@ body[data-theme="dark"] .menu-btn span { background: var(--cream); }
 .menu-overlay.open .menu-link:nth-child(2) { transition-delay: 0.26s; }
 .menu-overlay.open .menu-link:nth-child(3) { transition-delay: 0.34s; }
 .menu-overlay.open .menu-link:nth-child(4) { transition-delay: 0.42s; }
+.menu-overlay.open .menu-link:nth-child(5) { transition-delay: 0.50s; }
 .menu-link .idx { font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; color: var(--cream-55); vertical-align: super; margin-right: 18px; }
 .menu-link:hover { color: #d9a9bb; }
 .menu-foot { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; color: var(--cream-70); font-size: 13px; }

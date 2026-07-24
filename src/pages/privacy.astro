@@ -1,0 +1,173 @@
+---
+// A short, plain privacy policy. Written to be read, not to be survived: what
+// we collect, why, where it goes, and how to leave. Same calm page furniture as
+// the Get in touch page.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import { SITE } from '../lib/site';
+
+const title = 'Privacy policy | Cordial Advisory';
+const description =
+  'What we collect, why we collect it, where it is kept, and how to unsubscribe or ask us to delete it.';
+---
+
+<BaseLayout title={title} description={description} theme="light">
+  <TopBar />
+
+  <main class="page">
+    <header class="ph-head">
+      <p class="eyebrow">Privacy</p>
+      <h1>What we hold, and why.</h1>
+      <p class="lede">
+        Short version: we collect the least we can, we use it to do the thing you asked for, and
+        you can have it removed by sending one email.
+      </p>
+      <hr class="accent-rule head-rule" />
+    </header>
+
+    <div class="prose">
+      <h2>What we collect</h2>
+      <p>
+        If you send us a note or take the ISO 9001 readiness check, we collect your name and email
+        address, and your company name and phone number if you give them. The readiness check also
+        records your sector, your answers to the fifteen questions, and your score.
+      </p>
+
+      <h2>Why we collect it</h2>
+      <p>
+        To send you the thing you asked for, whether that is a reply or your readiness result. To
+        follow up if there is a good reason to, and to add you to the Cordial digest if you ticked
+        the box asking us to. We do not add anyone to the digest who has not ticked that box.
+      </p>
+
+      <h2>Where it is kept</h2>
+      <p>
+        Enquiries and readiness results are held in our own client system. Digest subscriptions are
+        held in our own marketing system. Email is sent through Resend, our email provider. We do
+        not sell your details, and we do not share them with anyone for their own marketing.
+      </p>
+
+      <h2>Unsubscribing</h2>
+      <p>
+        Every digest carries a one-click unsubscribe link. It takes effect immediately, and you can
+        still contact us afterwards without being added back.
+      </p>
+
+      <h2>Having your data deleted</h2>
+      <p>
+        Email <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and ask. We will delete what we hold
+        about you and confirm when it is done. You do not need to give a reason.
+      </p>
+
+      <h2>Getting in touch</h2>
+      <p>
+        Any question about this policy, or about what we hold, goes to the same address:
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. We are {SITE.legalName}, based in {SITE.locality},
+        {SITE.region}.
+      </p>
+    </div>
+
+    <footer class="cfoot">
+      <a class="back" href="/">Back to home <span class="arrow">&rarr;</span></a>
+      <span class="mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(56px, 9vw, 112px) clamp(24px, 5vw, 56px) clamp(72px, 9vw, 120px);
+  }
+  .ph-head h1 {
+    font-size: clamp(34px, 5.2vw, 52px);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    margin: 18px 0 0;
+  }
+  .ph-head .lede {
+    font-size: clamp(18px, 1.9vw, 21px);
+    line-height: 1.62;
+    color: var(--body);
+    margin: 22px 0 0;
+    max-width: 58ch;
+  }
+  .head-rule {
+    margin: clamp(32px, 5vh, 52px) 0 0;
+  }
+  .prose {
+    margin-top: clamp(36px, 5vh, 56px);
+  }
+  .prose h2 {
+    font-family: 'Karla', sans-serif;
+    font-size: clamp(20px, 2.2vw, 24px);
+    font-weight: 500;
+    color: var(--slate);
+    letter-spacing: -0.012em;
+    margin: clamp(34px, 4.5vh, 48px) 0 0;
+    padding-top: clamp(28px, 3.6vh, 38px);
+    border-top: 1px solid var(--hair);
+  }
+  .prose h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .prose p {
+    font-size: 17px;
+    line-height: 1.68;
+    color: var(--body);
+    margin: 14px 0 0;
+    max-width: 64ch;
+  }
+  .prose a {
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair-strong);
+  }
+  .prose a:hover {
+    opacity: 0.66;
+  }
+  .cfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cfoot .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .cfoot .back:hover {
+    opacity: 0.66;
+  }
+  .cfoot .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cfoot .back:hover .arrow {
+    transform: translateX(5px);
+  }
+  .cfoot .mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cfoot .back .arrow {
+      transition: none;
+    }
+  }
+</style>
