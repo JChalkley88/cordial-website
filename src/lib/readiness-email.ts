@@ -9,13 +9,16 @@ import { SITE } from './site';
 import { bandFor, gapsFor, scoreOf, type Answer, type Sector } from './readiness';
 import type { Question, Register } from './readiness-data';
 
-// Destinations used in the email body.
+// Destinations used in the email body. All four are decided, none are
+// placeholders.
 //
 // `booking` points at the homepage contact section, matching the sitewide
 // pattern since Microsoft Bookings was removed. `dashboard` is the live shared
-// ISO board. `workedExample` and `unsubscribe` are still placeholders: there is
-// no worked-example page yet, and this email is transactional rather than a
-// newsletter send, so it has no list to unsubscribe from.
+// ISO board. `workedExample` points at the ISO 9001 Journal post: a real and
+// relevant page for this audience, standing in until a dedicated worked-example
+// page exists. `unsubscribe` is a mailto rather than a list-unsubscribe link,
+// because this email is transactional and has no list of its own; it is a
+// catch-all for someone who ticked the digest box in the same submission.
 const LINKS = {
   booking: `${SITE.url}/#book`,
   dashboard: 'https://share.cordialadvisory.co.uk/ISO/ISO_1',

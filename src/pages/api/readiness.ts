@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { deliverToCrm } from '../../lib/crm';
 import {
   READINESS_SOURCE,
+  RESULTS_FROM,
   subscribeEmail,
   subscribeMessage,
   sendFallbackEmail,
@@ -118,9 +119,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const results = buildResultsEmail({ answers, sector, prompt });
     await sendHtmlEmail({
       to: email,
+      from: RESULTS_FROM,
       subject: results.subject,
       html: results.html,
       text: results.text,
+      // No replyTo: replies go to the From address, which is Anthony.
     });
   } catch (err) {
     delivered = false;

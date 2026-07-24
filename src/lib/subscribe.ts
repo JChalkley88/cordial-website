@@ -15,6 +15,9 @@ export const SOURCE = 'website-contact-form';
 // it carries its own source into both the CRM and the marketing app.
 export const READINESS_SOURCE = 'website-iso-readiness-check';
 const FROM = 'Cordial Website <website@cordialadvisory.co.uk>';
+// The readiness results are written and signed by Anthony, so they are sent
+// from his address rather than the generic website one.
+export const RESULTS_FROM = 'Anthony Pothecary <anthony@cordialadvisory.co.uk>';
 
 export type NewsletterOutcome =
   | 'none'
@@ -58,15 +61,22 @@ export async function sendFallbackEmail(subject: string, lines: string[]): Promi
   }
 }
 
-// Send an HTML email to a visitor-supplied address, from the same identity and
-// the same Resend key as the fallback. Used for the readiness results, which
-// the visitor has asked us to send them. Throws on failure so the caller can
-// fall back rather than silently drop it.
+// Send an HTML email to a visitor-supplied address, using the same Resend key
+// as the fallback. Used for the readiness results, which the visitor has asked
+// us to send them. Throws on failure so the caller can fall back rather than
+// silently drop it.
+//
+// `from` defaults to the generic website identity. The readiness results pass
+// Anthony's address instead, so the sender matches the person who signs the
+// email: a mismatch between a signed name and a noreply-style sender is both a
+// spam signal and simply odd to receive. Reply-To is deliberately left unset
+// unless a caller needs it, so it can never disagree with From.
 export async function sendHtmlEmail(options: {
   to: string;
   subject: string;
   html: string;
   text: string;
+  from?: string;
   replyTo?: string;
 }): Promise<void> {
   if (!RESEND_API_KEY) {
@@ -74,7 +84,7 @@ export async function sendHtmlEmail(options: {
   }
   const resend = new Resend(RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: FROM,
+    from: options.from || FROM,
     to: options.to,
     subject: options.subject,
     html: options.html,
