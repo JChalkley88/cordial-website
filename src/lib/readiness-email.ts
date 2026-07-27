@@ -206,7 +206,7 @@ export function buildResultsEmail({ answers, sector, prompt }: ResultsEmailInput
       `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:32px 0;"><tr><td style="border-top:1px solid ${C.hair};border-bottom:1px solid ${C.hair};padding:26px 0;">`,
       `<p style="${P}margin-bottom:18px;">This is what we build with businesses to keep ISO 9001 running, visible, current, and manageable in one place:</p>`,
       `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border:1px solid ${C.slate};">`,
-      `<a href="${LINKS.dashboard}" style="display:inline-block;padding:10px 14px;font-family:${KARLA};font-size:14px;font-weight:500;color:${C.slate};text-decoration:none;">${LINKS.dashboard.replace('https://', '')}</a>`,
+      `<a href="${LINKS.dashboard}" style="display:inline-block;padding:10px 14px;font-family:${KARLA};font-size:14px;font-weight:500;color:${C.slate};text-decoration:none;">View dashboard</a>`,
       '</td></tr></table>',
       '</td></tr></table>',
     ].join('\n  '),
