@@ -1,12 +1,14 @@
 // The results email, built server-side from the same QUESTIONS and BANDS the
 // page scores against, so the breakdown always matches the score the visitor
 // saw. Email-safe by construction: a table shell, inline styles only, and
-// web-safe font fallbacks, since Karla and Source Sans 3 are self-hosted for
-// the site and cannot be relied on in a mail client. Structure follows
-// iso-9001-results-email-sample.html.
+// web-safe font fallbacks. Karla and Source Sans 3 are requested via a head
+// @import for the clients that honour it (Apple Mail, some others); everywhere
+// else the stacks fall back to system sans. Presentation follows the site:
+// cream ground, slate headings, one aubergine accent (the tier line), hairlines
+// rather than boxes.
 
 import { SITE } from './site';
-import { bandFor, gapsFor, scoreOf, type Answer, type Sector } from './readiness';
+import { bandFor, gapsFor, scoreOf, SECTOR_OPTIONS, type Answer, type Sector } from './readiness';
 import type { Question, Register } from './readiness-data';
 
 // Destinations used in the email body. All four are decided, none are
@@ -28,25 +30,28 @@ const LINKS = {
 
 export const RESULTS_SUBJECT = 'Your ISO 9001 readiness results';
 
-// Palette, matching the sample. Kept as plain hex because email clients do not
-// support custom properties.
+// Palette, matching the site. Kept as plain hex because email clients do not
+// support custom properties. `hair` is rgba(45, 74, 92, 0.18) flattened onto
+// the cream ground: same rendered colour, but Outlook's Word engine drops rgba
+// borders entirely, so the hex keeps the hairlines everywhere.
 const C = {
   cream: '#F2EBDC',
-  card: '#fbf7ee',
-  border: '#d7cdb6',
-  hair: '#e7dfcb',
   slate: '#2D4A5C',
+  body: '#4A5560',
   muted: '#6b7d88',
   aubergine: '#5C3349',
-  head: '#efe7d5',
+  hair: '#CFCEC5',
 };
 
-const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
-const P = `font-family:${FONT};font-size:16px;line-height:1.55;color:${C.slate};margin:0 0 12px;`;
-const H2 = `font-family:${FONT};font-size:19px;font-weight:700;color:${C.slate};margin:24px 0 10px;`;
-const DETAIL = `font-family:${FONT};font-size:16px;line-height:1.55;color:${C.slate};margin:0 0 8px;padding-left:12px;border-left:2px solid ${C.border};`;
-const COST = `font-family:${FONT};font-size:15px;line-height:1.5;color:${C.muted};margin:0;`;
-const CAP = `font-family:${FONT};font-size:13px;font-style:italic;color:${C.muted};margin:0 0 20px;line-height:1.4;`;
+const KARLA = "'Karla','Helvetica Neue',Helvetica,Arial,sans-serif";
+const SANS = "'Source Sans 3','Helvetica Neue',Helvetica,Arial,sans-serif";
+
+const P = `font-family:${SANS};font-size:16px;line-height:1.6;color:${C.body};margin:0 0 14px;`;
+const H2 = `font-family:${KARLA};font-size:19px;font-weight:500;color:${C.slate};margin:0 0 12px;`;
+const DETAIL = `font-family:${SANS};font-size:16px;line-height:1.6;color:${C.body};margin:0 0 8px;padding-left:14px;border-left:1px solid ${C.hair};`;
+const COST = `font-family:${SANS};font-size:15px;line-height:1.6;color:${C.muted};margin:0;`;
+const CAP = `font-family:${SANS};font-size:13px;font-style:italic;color:${C.muted};margin:0 0 20px;line-height:1.5;`;
+const LINK = `color:${C.slate};text-decoration:underline;`;
 
 function esc(value: string): string {
   return value
@@ -60,29 +65,42 @@ function p(text: string, style = P): string {
   return `<p style="${style}">${esc(text)}</p>`;
 }
 
+// The short aubergine mark that opens each section: 40px wide, 1px high, 20px
+// clear before the heading. A table cell rather than a div so Outlook cannot
+// inflate its height.
+function mark(): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:36px 0 20px;"><tr><td width="40" height="1" bgcolor="${C.aubergine}" style="height:1px;line-height:1px;font-size:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr></table>`;
+}
+
+// Full-width hairline separator between major sections.
+function sep(margin = '28px 0'): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:${margin};"><tr><td height="1" bgcolor="${C.hair}" style="height:1px;line-height:1px;font-size:1px;mso-line-height-rule:exactly;">&nbsp;</td></tr></table>`;
+}
+
 // The worked-example register that matches the recommended fix, as a real
-// table rather than an image, so it survives image blocking.
+// table rather than an image, so it survives image blocking. Hairline rules
+// only, no filled header bar, so it sits quietly on the cream.
 function registerTable(reg: Register): string {
-  const th = `font-family:${FONT};font-size:12px;font-weight:700;letter-spacing:0.03em;color:${C.muted};padding:7px 12px;background:${C.head};`;
-  const td = `font-family:${FONT};font-size:13px;color:${C.slate};padding:7px 12px;border-top:1px solid ${C.hair};`;
+  const th = `font-family:${SANS};font-size:12px;font-weight:600;letter-spacing:0.04em;color:${C.muted};padding:0 12px 7px 0;border-bottom:1px solid ${C.hair};`;
+  const td = `font-family:${SANS};font-size:13px;color:${C.slate};padding:7px 12px 7px 0;border-bottom:1px solid ${C.hair};`;
   const head = reg.columns.map((c) => `<th align="left" style="${th}">${esc(c)}</th>`).join('');
   const body = reg.rows
     .map((row) => `<tr>${row.map((cell) => `<td style="${td}">${esc(cell)}</td>`).join('')}</tr>`)
     .join('');
   return [
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid ${C.border};border-collapse:collapse;background:${C.card};margin:18px 0 8px;">`,
-    `<tr><td colspan="${reg.columns.length}" style="background:${C.slate};color:${C.cream};font-family:${FONT};font-weight:700;font-size:14px;padding:9px 12px;">${esc(reg.title)}</td></tr>`,
+    `<p style="font-family:${KARLA};font-size:15px;font-weight:500;color:${C.slate};margin:22px 0 10px;">${esc(reg.title)}</p>`,
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 10px;">`,
     `<tr>${head}</tr>`,
     body,
     '</table>',
-    `<p style="${CAP}">From our worked example, a fictional Oxfordshire machine shop, invented figures. <a href="${LINKS.workedExample}" style="color:${C.aubergine};">View the worked example</a>.</p>`,
+    `<p style="${CAP}">From our worked example, a fictional Oxfordshire machine shop, invented figures. <a href="${LINKS.workedExample}" style="${LINK}">View the worked example</a>.</p>`,
   ].join('\n  ');
 }
 
 function gapBlock(q: Question, sector: Sector): string {
   return [
-    `<div style="border-top:1px solid ${C.hair};padding:14px 0 6px;">`,
-    `<p style="${P}"><strong>${esc(q.gap)}</strong></p>`,
+    `<div style="border-top:1px solid ${C.hair};padding:18px 0 8px;">`,
+    `<p style="font-family:${SANS};font-size:16px;line-height:1.6;color:${C.slate};font-weight:600;margin:0 0 10px;">${esc(q.gap)}</p>`,
     p(q.tip),
     `<p style="${DETAIL}">${esc(q.detail[sector] || q.detail.other)}</p>`,
     `<p style="${COST}"><span style="font-weight:600;color:${C.slate};">What this costs you today:</span> ${esc(q.cost)}</p>`,
@@ -108,18 +126,36 @@ export function buildResultsEmail({ answers, sector, prompt }: ResultsEmailInput
   const band = bandFor(score);
   const gaps = gapsFor(answers).map((g) => g.question);
   const recommended = gaps[0];
+  const sectorLabel = SECTOR_OPTIONS.find((o) => o.value === sector)?.label ?? 'Other';
 
   const body: string[] = [];
 
+  // Wordmark, matching the site header: Karla name over the small tracked
+  // descriptor, top left, slate on cream.
+  body.push(
+    [
+      '<div style="margin:0 0 40px;">',
+      `<p style="font-family:${KARLA};font-size:23px;font-weight:500;color:${C.slate};line-height:1;margin:0;">Cordial</p>`,
+      `<p style="font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:0.32em;color:${C.slate};margin:6px 0 0;">ADVISORY</p>`,
+      '</div>',
+    ].join('\n  '),
+  );
+
   body.push(p('Hi there,'));
   body.push(p(`Thanks for taking the readiness check. Your score was ${score} out of 15.`));
+
+  // The tier line is the one aubergine accent moment in the email. Below it, a
+  // muted score and sector line; then the band sentence in body colour.
   body.push(
-    `<h3 style="font-family:${FONT};font-size:20px;font-weight:700;color:${C.slate};margin:4px 0 8px;">${esc(band.heading)}</h3>`,
+    `<p style="font-family:${KARLA};font-size:26px;font-weight:500;line-height:1.2;color:${C.aubergine};margin:26px 0 10px;" class="tier">${esc(band.heading)}</p>`,
+  );
+  body.push(
+    `<p style="font-family:${SANS};font-size:14px;color:${C.muted};margin:0 0 18px;">Score: ${score} out of 15 &middot; Sector: ${esc(sectorLabel)}</p>`,
   );
   body.push(p(band.sentence));
   if (prompt) {
     body.push(
-      `<p style="font-family:${FONT};font-size:16px;line-height:1.55;margin:0 0 12px;font-style:italic;color:${C.muted};">${esc(
+      `<p style="font-family:${SANS};font-size:16px;line-height:1.6;margin:0 0 14px;font-style:italic;color:${C.muted};">${esc(
         `You told us what prompted this: ${prompt}`,
       )}</p>`,
     );
@@ -145,11 +181,15 @@ export function buildResultsEmail({ answers, sector, prompt }: ResultsEmailInput
 
     gaps.forEach((q) => body.push(gapBlock(q, sector)));
 
+    body.push(mark());
     body.push(`<h2 style="${H2}">The one to start with</h2>`);
     body.push(p('Of all the gaps above, this is the one we would start with. Here is why, and here is a plan.'));
-    body.push(`<p style="${P}"><strong>${esc(recommended.gap)}</strong></p>`);
+    body.push(
+      `<p style="font-family:${SANS};font-size:16px;line-height:1.6;color:${C.slate};font-weight:600;margin:0 0 10px;">${esc(recommended.gap)}</p>`,
+    );
     body.push(p(recommended.plan));
     body.push(registerTable(recommended.register));
+    body.push(mark());
     body.push(`<h2 style="${H2}">A note on what this looks like in practice</h2>`);
     body.push(
       p(
@@ -158,30 +198,54 @@ export function buildResultsEmail({ answers, sector, prompt }: ResultsEmailInput
     );
   }
 
-  // The dashboard sits after the result summary and before the call to action.
+  // The dashboard sits after the result summary and before the call to action,
+  // in a hairline-topped-and-bottomed block: the context line verbatim, then
+  // the link as an outlined button.
   body.push(
-    `<p style="${P}">This is what we build with businesses to keep ISO 9001 running, visible, current, and manageable in one place: <a href="${LINKS.dashboard}" style="color:${C.aubergine};">${LINKS.dashboard}</a></p>`,
+    [
+      `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:32px 0;"><tr><td style="border-top:1px solid ${C.hair};border-bottom:1px solid ${C.hair};padding:26px 0;">`,
+      `<p style="${P}margin-bottom:18px;">This is what we build with businesses to keep ISO 9001 running, visible, current, and manageable in one place:</p>`,
+      `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border:1px solid ${C.slate};">`,
+      `<a href="${LINKS.dashboard}" style="display:inline-block;padding:10px 14px;font-family:${KARLA};font-size:14px;font-weight:500;color:${C.slate};text-decoration:none;">${LINKS.dashboard.replace('https://', '')}</a>`,
+      '</td></tr></table>',
+      '</td></tr></table>',
+    ].join('\n  '),
   );
 
+  body.push(mark());
   body.push(`<h2 style="${H2}">Where Cordial fits</h2>`);
   body.push(
-    `<p style="${P}">We are Cordial Advisory. We are a founder-led practice based in Oxfordshire, and we work with growing UK businesses on the operational side of what they do, including ISO 9001 readiness and implementation. If the plan above is useful and you want a hand actually doing it, we run a full ISO 9001 gap analysis. No charge, no hard sell, if you would like a <a href="${LINKS.booking}" style="color:${C.aubergine};">45-minute call</a> to talk through what you have just read.</p>`,
+    `<p style="${P}">We are Cordial Advisory. We are a founder-led practice based in Oxfordshire, and we work with growing UK businesses on the operational side of what they do, including ISO 9001 readiness and implementation. If the plan above is useful and you want a hand actually doing it, we run a full ISO 9001 gap analysis. No charge, no hard sell, if you would like a <a href="${LINKS.booking}" style="${LINK}">45-minute call</a> to talk through what you have just read.</p>`,
+  );
+
+  // The one solid button in the email, centred, with the quieter alternative
+  // route beneath it.
+  body.push(
+    [
+      '<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:30px auto 8px;"><tr>',
+      `<td bgcolor="${C.slate}"><a href="${LINKS.booking}" style="display:inline-block;padding:14px 32px;font-family:${KARLA};font-size:16px;font-weight:500;color:${C.cream};text-decoration:none;">Book a call with Anthony</a></td>`,
+      '</tr></table>',
+      `<p style="font-family:${SANS};font-size:14px;color:${C.muted};margin:0 0 14px;text-align:center;">or reply to this email</p>`,
+    ].join('\n  '),
   );
 
   body.push(
     [
-      '<div style="margin-top:20px;">',
+      '<div style="margin-top:24px;">',
       `<p style="${P}margin-bottom:2px;">Best,</p>`,
-      `<p style="font-family:${FONT};font-size:16px;font-weight:700;color:${C.slate};margin:0 0 2px;">Anthony Pothecary</p>`,
-      `<p style="font-family:${FONT};font-size:15px;color:${C.muted};margin:0 0 2px;">Co-founder, Cordial Advisory</p>`,
-      `<p style="font-family:${FONT};font-size:15px;color:${C.muted};margin:0;">cordialadvisory.co.uk</p>`,
+      `<p style="font-family:${SANS};font-size:16px;font-weight:600;color:${C.slate};margin:0 0 2px;">Anthony Pothecary</p>`,
+      `<p style="font-family:${SANS};font-size:15px;color:${C.muted};margin:0 0 2px;">Co-founder, Cordial Advisory</p>`,
+      `<p style="font-family:${SANS};font-size:15px;color:${C.muted};margin:0;">cordialadvisory.co.uk</p>`,
       '</div>',
     ].join('\n  '),
   );
 
   body.push(
     [
-      `<div style="margin-top:22px;padding-top:14px;border-top:1px solid ${C.hair};font-family:${FONT};font-size:14px;color:${C.muted};line-height:1.5;">`,
+      `<div style="margin-top:30px;padding-top:18px;border-top:1px solid ${C.hair};font-family:${SANS};font-size:13px;color:${C.muted};line-height:1.6;">`,
+      `<p style="font-family:${KARLA};font-size:14px;font-weight:500;color:${C.slate};margin:0 0 6px;">Cordial Advisory</p>`,
+      `<p style="margin:0 0 2px;"><a href="mailto:${SITE.email}" style="color:${C.muted};">${SITE.email}</a></p>`,
+      `<p style="margin:0 0 10px;"><a href="${SITE.url}" style="color:${C.muted};">cordialadvisory.co.uk</a></p>`,
       `<p style="margin:0 0 8px;">Cordial Advisory, Wantage, Oxfordshire. <a href="${LINKS.unsubscribe}" style="color:${C.muted};">Unsubscribe</a>.</p>`,
       '<p style="margin:0;">Your answers and this breakdown are indicative, not an audit. Certification bodies assess the business itself.</p>',
       '</div>',
@@ -195,13 +259,21 @@ export function buildResultsEmail({ answers, sector, prompt }: ResultsEmailInput
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
     `<title>${RESULTS_SUBJECT}</title>`,
+    '<style>',
+    "@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap');",
+    '@media only screen and (max-width:600px){',
+    '  .container{width:100% !important;}',
+    '  .content{padding:32px 24px !important;}',
+    '  .tier{font-size:23px !important;}',
+    '}',
+    '</style>',
     '</head>',
     `<body style="margin:0;padding:0;background:${C.cream};">`,
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.cream};">`,
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${C.cream}" style="background:${C.cream};">`,
     '  <tr>',
-    '    <td align="center" style="padding:24px 12px;">',
-    `      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="width:640px;max-width:100%;background:${C.card};border:1px solid ${C.border};">`,
-    '        <tr><td style="padding:20px;">',
+    '    <td align="center" style="padding:16px 12px;">',
+    `      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" class="container" style="width:640px;max-width:100%;">`,
+    '        <tr><td class="content" style="padding:44px 44px 36px;">',
     body.join('\n  '),
     '        </td></tr>',
     '      </table>',
