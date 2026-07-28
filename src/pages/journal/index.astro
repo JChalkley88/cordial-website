@@ -2,8 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
 import JournalNewsletter from '../../components/JournalNewsletter.astro';
-import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
-import { READINESS_IMAGES } from '../../lib/site';
+import { getPublishedPosts, postPath, formatDate, READINESS_ENTRY } from '../../lib/journal';
 
 const allPosts = await getPublishedPosts();
 const posts = allPosts.slice(0, 3); // the preview shows a selection of recent posts
@@ -33,22 +32,19 @@ const description =
         <div class="je-row">
           <div class="je-inner">
             <div class="je-meta">
-              <span class="je-label">ISO 9001 readiness check</span>
-              <span class="je-date">28 July 2026</span>
+              <span class="je-label">{READINESS_ENTRY.label}</span>
+              <span class="je-date">{formatDate(READINESS_ENTRY.date)}</span>
             </div>
-            <a class="je-title-link" href="/journal/iso-9001-readiness-check">
-              <h2 class="je-title">How ready is your business for ISO 9001?</h2>
+            <a class="je-title-link" href={READINESS_ENTRY.href}>
+              <h2 class="je-title">{READINESS_ENTRY.title}</h2>
             </a>
-            <p class="je-excerpt">
-              Fifteen yes-or-no questions on how you run the work already. You get a score, a band,
-              and a written breakdown of where your gaps are and what to do first.
-            </p>
-            <a class="tool-go" href="/journal/iso-9001-readiness-check">
-              Take the readiness check <span class="arrow">&rarr;</span>
+            <p class="je-excerpt">{READINESS_ENTRY.excerpt}</p>
+            <a class="tool-go" href={READINESS_ENTRY.href}>
+              {READINESS_ENTRY.cta} <span class="arrow">&rarr;</span>
             </a>
           </div>
-          <a class="je-thumb-link" href="/journal/iso-9001-readiness-check" aria-hidden="true" tabindex="-1">
-            <img class="je-thumb" src={READINESS_IMAGES.card} alt="" loading="lazy" />
+          <a class="je-thumb-link" href={READINESS_ENTRY.href} aria-hidden="true" tabindex="-1">
+            <img class="je-thumb" src={READINESS_ENTRY.image} alt="" loading="lazy" />
           </a>
         </div>
       </article>
