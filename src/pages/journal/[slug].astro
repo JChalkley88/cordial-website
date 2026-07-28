@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
 import JournalNewsletter from '../../components/JournalNewsletter.astro';
+import ReadinessCallout from '../../components/ReadinessCallout.astro';
 import { postSlug, postPath, formatDate, readingTime, type JournalEntry } from '../../lib/journal';
 import { SITE } from '../../lib/site';
 
@@ -78,6 +79,8 @@ const articleLd = {
     <div class="prose reveal-up">
       <Content />
     </div>
+
+    {data.readinessCheck && <div class="reveal-up"><ReadinessCallout /></div>}
 
     <div class="article-foot reveal-up">
       <p class="foot-author"><span class="who">{data.author}</span> {BIOS[data.author]}</p>

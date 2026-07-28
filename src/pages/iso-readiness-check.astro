@@ -1,0 +1,850 @@
+---
+// The ISO 9001 readiness check. Fifteen yes-or-no questions, a score and a band
+// on screen, and the full written breakdown by email.
+//
+// The questions render server-side from the shared data, so they exist without
+// JavaScript and the page never ships a data blob. The client script only
+// records answers and works out the score and band. The tips, the first-fix
+// plan and the worked example stay on the server and arrive by email, which is
+// what the email address is being given for.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import { QUESTIONS, BANDS, SECTOR_OPTIONS, QUESTION_COUNT } from '../lib/readiness';
+
+const title = 'ISO 9001 readiness check | Cordial Advisory';
+const description =
+  'A short readiness check for a growing UK business thinking about ISO 9001. Fifteen yes-or-no questions, a score, and a written breakdown of where your gaps are.';
+
+// The bands, lowest first, for the structured data and for anyone reading the
+// page source. The score itself is worked out in the browser.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'ISO 9001 readiness check',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Any',
+  description,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+};
+---
+
+<BaseLayout title={title} description={description} theme="light" jsonLd={jsonLd}>
+  <TopBar />
+
+  <main class="page">
+    <header class="rc-head">
+      <p class="eyebrow">ISO 9001 readiness check</p>
+      <h1 class="rc-h1">Could you show an auditor the evidence?</h1>
+      <p class="rc-lede">
+        A short readiness check for a growing UK business thinking about ISO 9001. Fifteen
+        yes-or-no questions on how you run the work already. You will get a score, a band, and a
+        personalised email showing where your gaps are, what to do first, and a first-fix plan for
+        the one that will make the most difference.
+      </p>
+      <p class="rc-lede">
+        No sign-in required to see your score. Enter an email at the end to receive the full
+        breakdown.
+      </p>
+      <hr class="accent-rule rc-rule" />
+    </header>
+
+    <div class="rc-questions" id="rc-questions">
+      {
+        QUESTIONS.map((q, i) => (
+          <div class="rc-q" data-gap={q.gap}>
+            <p class="rc-q-index">Question {i + 1} of {QUESTION_COUNT}</p>
+            <p class="rc-q-text">{q.text}</p>
+            <div class="rc-toggles" role="group" aria-label={`Question ${i + 1} answer`}>
+              <button type="button" class="rc-toggle" data-q={i} data-val="yes" aria-pressed="false">
+                Yes
+              </button>
+              <button type="button" class="rc-toggle" data-q={i} data-val="no" aria-pressed="false">
+                No
+              </button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="rc-cta">
+      <button class="btn btn-primary" id="rc-show" disabled>
+        Answer all fifteen to see your result
+      </button>
+    </div>
+
+    <!-- Split delivery. The score and band appear as soon as all fifteen are
+         answered, so "no sign-in required to see your score" stays true. The
+         written plan is what the email is for. -->
+    <section class="rc-result" id="rc-result" aria-live="polite">
+      <p class="rc-score"><span id="rc-score-n">0</span><span class="rc-score-of"> of {QUESTION_COUNT}</span></p>
+      <h2 class="rc-band" id="rc-band-heading"></h2>
+      <p class="rc-band-sentence" id="rc-band-sentence"></p>
+
+      <div class="rc-gaps" id="rc-gaps" hidden>
+        <h3 class="rc-gaps-h">Where your gaps are</h3>
+        <ol class="rc-gap-list" id="rc-gap-list"></ol>
+      </div>
+    </section>
+
+    <section class="rc-gate" id="rc-gate" aria-live="polite">
+      <h2 class="rc-gate-h">Enter your email at the end for the full breakdown.</h2>
+      <p class="rc-gate-lede">
+        The written plan goes further than the score above: a tip for each gap, what it costs you
+        today, and a first-fix plan for the one to start with, in the language of your sector.
+      </p>
+
+      <div class="rc-formwrap">
+        <form class="rc-form" id="rc-form" novalidate>
+          <div class="rc-fields">
+            <div class="gt-field">
+              <label for="rc-name">Name</label>
+              <input id="rc-name" name="name" type="text" autocomplete="name" required />
+            </div>
+
+            <div class="gt-field">
+              <label for="rc-email">Email</label>
+              <input id="rc-email" name="email" type="email" autocomplete="email" required />
+            </div>
+
+            <label class="gt-optin" for="rc-optin">
+              <input id="rc-optin" name="newsletter" type="checkbox" />
+              <span>Yes, send me the Cordial digest, roughly fortnightly.</span>
+            </label>
+
+            <p class="rc-consent">
+              We use your email to send you the result and to add you to the Cordial digest if you
+              tick the box above. You can unsubscribe with one click. See our
+              <a href="/privacy">privacy policy</a>.
+            </p>
+
+            <div class="gt-field gt-field-hear">
+              <label id="rc-sector-label">Your sector <span class="gt-opt">(optional)</span></label>
+              <div class="gt-select" data-select>
+                <button
+                  type="button"
+                  class="gt-select-btn"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="rc-sector-label"
+                >
+                  <span class="gt-select-val placeholder" data-val>Choose your sector</span>
+                  <span class="gt-select-caret" aria-hidden="true"></span>
+                </button>
+                <ul class="gt-select-list" role="listbox" aria-labelledby="rc-sector-label" tabindex="-1">
+                  {
+                    SECTOR_OPTIONS.map((o) => (
+                      <li class="gt-select-opt" role="option" data-value={o.value} aria-selected="false">
+                        {o.label}
+                      </li>
+                    ))
+                  }
+                </ul>
+                <input type="hidden" id="rc-sector" name="sector" value="" />
+              </div>
+            </div>
+
+            <div class="gt-field">
+              <label for="rc-prompt">What prompted you to check? <span class="gt-opt">(optional)</span></label>
+              <textarea
+                id="rc-prompt"
+                name="prompt"
+                rows="3"
+                placeholder="A customer asked, a contract is coming up, curiosity. A line is plenty."
+              ></textarea>
+            </div>
+
+            <!-- Hidden from people, filled only by bots. Left empty by anyone real. -->
+            <div class="rc-hp" aria-hidden="true">
+              <label for="rc-website">Website</label>
+              <input id="rc-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div class="gt-submit">
+              <button class="btn btn-primary" type="submit" id="rc-submit">Send me the breakdown</button>
+            </div>
+            <p class="rc-error" id="rc-error" role="alert" hidden></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Shown once the breakdown has been sent, in place of the form. -->
+    <section class="rc-done" id="rc-done">
+      <p class="rc-sent" id="rc-sent" role="status" aria-live="polite"></p>
+      <a class="btn btn-primary rc-book" href="/#book" id="rc-book">Book a call with Anthony</a>
+    </section>
+
+    <footer class="cfoot">
+      <a class="back" href="/">Back to home <span class="arrow">&rarr;</span></a>
+      <span class="mark">&copy; 2026 Cordial Advisory Ltd</span>
+    </footer>
+  </main>
+
+  <div class="rc-marker" role="status" aria-live="polite">
+    <div class="rc-marker-inner">
+      <div class="rc-marker-count">
+        <span id="rc-count">0 of {QUESTION_COUNT} answered</span>
+        <small>yes or no, about three minutes</small>
+      </div>
+      <button class="btn btn-primary" id="rc-marker-btn" disabled>Show my result</button>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline define:vars={{ BANDS, QUESTION_COUNT }}>
+  (function () {
+    'use strict';
+
+    var loadedAt = Date.now();
+    var answers = new Array(QUESTION_COUNT);
+    var resultShown = false;
+    var sentAlready = false;
+
+    var elQuestions = document.getElementById('rc-questions');
+    var elShow = document.getElementById('rc-show');
+    var elMarkerBtn = document.getElementById('rc-marker-btn');
+    var elCount = document.getElementById('rc-count');
+    var elGate = document.getElementById('rc-gate');
+    var elResult = document.getElementById('rc-result');
+    var elScoreN = document.getElementById('rc-score-n');
+    var elBandHeading = document.getElementById('rc-band-heading');
+    var elBandSentence = document.getElementById('rc-band-sentence');
+    var elGaps = document.getElementById('rc-gaps');
+    var elGapList = document.getElementById('rc-gap-list');
+    var elForm = document.getElementById('rc-form');
+    var elError = document.getElementById('rc-error');
+    var elSubmit = document.getElementById('rc-submit');
+
+    var cards = Array.prototype.slice.call(elQuestions.querySelectorAll('.rc-q'));
+    var toggleRefs = [];
+    var startedFired = false;
+    var completeFired = false;
+
+    // GA4 via the gtag snippet BaseLayout emits when PUBLIC_GA_MEASUREMENT_ID is
+    // set. No-op when analytics is not configured, so nothing breaks locally.
+    function track(name, params) {
+      if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+    }
+
+    Array.prototype.forEach.call(elQuestions.querySelectorAll('.rc-toggle'), function (btn) {
+      var i = parseInt(btn.getAttribute('data-q'), 10);
+      var value = btn.getAttribute('data-val');
+      if (!toggleRefs[i]) toggleRefs[i] = {};
+      toggleRefs[i][value] = btn;
+      btn.addEventListener('click', function () {
+        if (!startedFired) {
+          startedFired = true;
+          track('readiness_start');
+        }
+        answers[i] = value;
+        track('readiness_question_answered', { question: i + 1, answer: value });
+        refreshQuestion(i);
+        onAnswerChange();
+      });
+    });
+
+    function refreshQuestion(i) {
+      var refs = toggleRefs[i];
+      if (!refs) return;
+      if (refs.yes) refs.yes.setAttribute('aria-pressed', answers[i] === 'yes' ? 'true' : 'false');
+      if (refs.no) refs.no.setAttribute('aria-pressed', answers[i] === 'no' ? 'true' : 'false');
+      cards[i].classList.toggle('answered', answers[i] === 'yes' || answers[i] === 'no');
+    }
+
+    function answeredCount() {
+      var n = 0;
+      for (var i = 0; i < answers.length; i++) {
+        if (answers[i] === 'yes' || answers[i] === 'no') n++;
+      }
+      return n;
+    }
+
+    function score() {
+      var n = 0;
+      for (var i = 0; i < answers.length; i++) {
+        if (answers[i] === 'yes') n++;
+      }
+      return n;
+    }
+
+    function bandFor(s) {
+      for (var i = 0; i < BANDS.length; i++) {
+        if (s >= BANDS[i].min && s <= BANDS[i].max) return BANDS[i];
+      }
+      return BANDS[BANDS.length - 1];
+    }
+
+    function onAnswerChange() {
+      var count = answeredCount();
+      var complete = count === QUESTION_COUNT;
+
+      elCount.textContent = count + ' of ' + QUESTION_COUNT + ' answered';
+      elShow.disabled = !complete;
+      elMarkerBtn.disabled = !complete;
+      elShow.textContent = complete ? 'Show my result' : 'Answer all fifteen to see your result';
+
+      if (complete && !completeFired) {
+        completeFired = true;
+        track('readiness_complete', { score: score() });
+      }
+
+      if (resultShown) renderResult();
+    }
+
+    function renderResult() {
+      var s = score();
+      var band = bandFor(s);
+      elScoreN.textContent = String(s);
+      elBandHeading.textContent = band.heading;
+      elBandSentence.textContent = band.sentence;
+
+      // The gap headings come from the markup, so no question copy beyond what
+      // is already on the page is ever sent to the browser.
+      elGapList.innerHTML = '';
+      var any = false;
+      for (var i = 0; i < answers.length; i++) {
+        if (answers[i] !== 'no') continue;
+        any = true;
+        var li = document.createElement('li');
+        var num = document.createElement('span');
+        num.className = 'rc-gap-num';
+        num.textContent = i + 1 < 10 ? '0' + (i + 1) : String(i + 1);
+        li.appendChild(num);
+        li.appendChild(document.createTextNode(cards[i].getAttribute('data-gap')));
+        elGapList.appendChild(li);
+      }
+      elGaps.hidden = !any;
+    }
+
+    // Split delivery: the score and band show straight away, and the gate for
+    // the written breakdown opens underneath them.
+    function showResult() {
+      if (answeredCount() !== QUESTION_COUNT) return;
+      var first = !resultShown;
+      resultShown = true;
+      renderResult();
+      elResult.classList.add('show');
+      if (!sentAlready) elGate.classList.add('show');
+      if (first) track('readiness_tier_reached', { score: score(), tier: bandFor(score()).heading });
+      elResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    elShow.addEventListener('click', showResult);
+    elMarkerBtn.addEventListener('click', showResult);
+
+    document.getElementById('rc-book').addEventListener('click', function () {
+      track('book_call_click', { from: 'iso-readiness-check', score: score() });
+    });
+
+    // The brand dropdown, same behaviour as the contact form: no native select,
+    // so no browser-blue highlight. Mirrors into the hidden sector input.
+    (function wireSelect() {
+      var wrap = elForm.querySelector('[data-select]');
+      if (!wrap) return;
+      var btn = wrap.querySelector('.gt-select-btn');
+      var valEl = wrap.querySelector('[data-val]');
+      var hidden = wrap.querySelector('input[type="hidden"]');
+      var opts = Array.prototype.slice.call(wrap.querySelectorAll('.gt-select-opt'));
+      var open = false;
+      var active = null;
+
+      function setActive(opt) {
+        opts.forEach(function (o) { o.classList.toggle('active', o === opt); });
+        active = opt;
+      }
+      function choose(opt) {
+        opts.forEach(function (o) { o.setAttribute('aria-selected', o === opt ? 'true' : 'false'); });
+        valEl.textContent = opt.textContent.trim();
+        valEl.classList.remove('placeholder');
+        hidden.value = opt.getAttribute('data-value');
+        setOpen(false);
+        btn.focus();
+      }
+      function onDoc(e) { if (!wrap.contains(e.target)) setOpen(false); }
+      function onKey(e) {
+        if (e.key === 'Escape') { setOpen(false); btn.focus(); return; }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var i = opts.indexOf(active);
+          i = e.key === 'ArrowDown' ? Math.min(opts.length - 1, i + 1) : Math.max(0, i < 0 ? 0 : i - 1);
+          setActive(opts[i]);
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          if (active) { e.preventDefault(); choose(active); }
+        }
+      }
+      function setOpen(o) {
+        open = o;
+        wrap.classList.toggle('open', o);
+        btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+        if (o) {
+          if (!active) setActive(wrap.querySelector('.gt-select-opt[aria-selected="true"]') || opts[0]);
+          document.addEventListener('click', onDoc, true);
+          document.addEventListener('keydown', onKey, true);
+        } else {
+          document.removeEventListener('click', onDoc, true);
+          document.removeEventListener('keydown', onKey, true);
+        }
+      }
+      btn.addEventListener('click', function () { setOpen(!open); });
+      opts.forEach(function (opt) {
+        opt.addEventListener('click', function () { choose(opt); });
+        opt.addEventListener('mousemove', function () { setActive(opt); });
+      });
+    })();
+
+    // Submit: /api/readiness sends the results, writes the lead and handles the
+    // opt-in. The bearer tokens and the Resend key never reach the browser.
+    var DEFAULT_THANKS = 'Thank you. Your results are on their way to your inbox.';
+    function fail(message, focusId) {
+      elError.textContent = message;
+      elError.hidden = false;
+      var f = document.getElementById(focusId);
+      if (f) f.focus();
+    }
+
+    elForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      elError.hidden = true;
+
+      var get = function (id) {
+        var f = document.getElementById(id);
+        return f ? f.value.trim() : '';
+      };
+      var name = get('rc-name');
+      var email = get('rc-email');
+      var sector = get('rc-sector');
+
+      if (answeredCount() !== QUESTION_COUNT) {
+        fail('Please answer all fifteen questions first.', 'rc-show');
+        return;
+      }
+      if (!name) { fail('Please add your name.', 'rc-name'); return; }
+      if (email.indexOf('@') < 1) { fail('Please enter a valid email address.', 'rc-email'); return; }
+
+      var payload = {
+        name: name,
+        email: email,
+        sector: sector || 'other',
+        prompt: get('rc-prompt'),
+        answers: answers,
+        newsletter: !!document.getElementById('rc-optin').checked,
+        website: get('rc-website'),
+        elapsed_ms: Date.now() - loadedAt,
+        submitted_at: new Date().toISOString(),
+      };
+
+      elSubmit.disabled = true;
+      var thanks = DEFAULT_THANKS;
+      try {
+        var res = await fetch('/api/readiness', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok) {
+          elSubmit.disabled = false;
+          fail(data && data.error ? data.error : 'Something went wrong. Please try again.', 'rc-email');
+          return;
+        }
+        if (data && typeof data.message === 'string' && data.message) thanks = data.message;
+      } catch (x) {
+        // Network failure: the visitor keeps their result on screen and gets a
+        // calm note. The server has the fallback for the cases it can reach.
+      }
+      sentAlready = true;
+      document.getElementById('rc-sent').textContent = thanks;
+      elGate.classList.remove('show');
+      document.getElementById('rc-done').classList.add('show');
+      document.getElementById('rc-done').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    onAnswerChange();
+  })();
+</script>
+
+<style>
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(56px, 9vw, 112px) clamp(24px, 5vw, 56px) clamp(120px, 14vw, 180px);
+  }
+
+  /* ---------- header ---------- */
+  .rc-h1 {
+    font-size: clamp(34px, 5.2vw, 56px);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    margin: 18px 0 0;
+  }
+  .rc-lede {
+    font-size: clamp(18px, 1.9vw, 21px);
+    line-height: 1.62;
+    color: var(--body);
+    margin: 22px 0 0;
+    max-width: 62ch;
+  }
+  /* The one accent moment in this section. */
+  .rc-rule {
+    margin: clamp(32px, 5vh, 52px) 0 0;
+  }
+
+  /* ---------- questions ---------- */
+  .rc-questions {
+    margin-top: clamp(40px, 6vh, 64px);
+  }
+  .rc-q {
+    border-top: 1px solid var(--hair);
+    padding: clamp(26px, 4vh, 38px) 0;
+  }
+  .rc-q:last-child {
+    border-bottom: 1px solid var(--hair);
+  }
+  .rc-q-index {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(45, 74, 92, 0.55);
+    margin: 0 0 12px;
+    transition: color 0.3s ease;
+  }
+  .rc-q.answered .rc-q-index {
+    color: var(--slate);
+  }
+  .rc-q-text {
+    font-family: 'Karla', sans-serif;
+    font-size: clamp(20px, 2.3vw, 25px);
+    line-height: 1.28;
+    letter-spacing: -0.012em;
+    color: var(--slate);
+    text-wrap: pretty;
+    margin: 0 0 22px;
+  }
+  .rc-toggles {
+    display: flex;
+    gap: 12px;
+  }
+  .rc-toggle {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+    background: transparent;
+    border: 1px solid var(--hair-strong);
+    border-radius: 999px;
+    padding: 9px 30px;
+    cursor: pointer;
+    transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+  }
+  .rc-toggle:hover {
+    border-color: var(--slate);
+  }
+  .rc-toggle:focus-visible {
+    outline: 2px solid var(--slate);
+    outline-offset: 2px;
+  }
+  .rc-toggle[aria-pressed='true'] {
+    background: var(--slate);
+    border-color: var(--slate);
+    color: var(--cream);
+  }
+
+  /* ---------- show result ---------- */
+  .rc-cta {
+    margin-top: clamp(32px, 5vh, 48px);
+  }
+  .rc-cta .btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* ---------- email gate ---------- */
+  .rc-gate {
+    display: none;
+    margin-top: clamp(48px, 8vh, 88px);
+    padding-top: clamp(36px, 5vh, 56px);
+    border-top: 1px solid var(--hair);
+  }
+  .rc-gate.show {
+    display: block;
+  }
+  .rc-gate-h {
+    font-size: clamp(24px, 3.2vw, 36px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.14;
+    text-wrap: balance;
+    margin: 0;
+    max-width: 22ch;
+  }
+  .rc-gate-lede {
+    font-size: clamp(16px, 1.7vw, 18px);
+    line-height: 1.6;
+    color: var(--body);
+    margin: 16px 0 0;
+    max-width: 58ch;
+  }
+  .rc-gate .rc-formwrap {
+    margin-top: clamp(28px, 4vh, 44px);
+  }
+
+  /* ---------- sent confirmation ---------- */
+  .rc-done {
+    display: none;
+    margin-top: clamp(40px, 6vh, 64px);
+    padding-top: clamp(30px, 4vh, 48px);
+    border-top: 1px solid var(--hair);
+  }
+  .rc-done.show {
+    display: block;
+  }
+  .rc-book {
+    margin-top: 24px;
+  }
+
+  /* ---------- result ---------- */
+  .rc-result {
+    display: none;
+    margin-top: clamp(48px, 8vh, 88px);
+    padding-top: clamp(36px, 5vh, 56px);
+    border-top: 1px solid var(--hair);
+  }
+  .rc-result.show {
+    display: block;
+  }
+  .rc-score {
+    font-family: 'Karla', sans-serif;
+    font-size: clamp(52px, 9vw, 88px);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    /* The one accent moment in the result. */
+    color: var(--aubergine);
+    margin: 0;
+  }
+  .rc-score-of {
+    font-size: clamp(20px, 2.4vw, 26px);
+    font-weight: 400;
+    color: rgba(45, 74, 92, 0.55);
+    letter-spacing: 0;
+  }
+  .rc-band {
+    font-size: clamp(28px, 3.6vw, 42px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 20px 0 0;
+  }
+  .rc-band-sentence {
+    font-size: clamp(17px, 1.8vw, 20px);
+    line-height: 1.62;
+    color: var(--body);
+    margin: 16px 0 0;
+    max-width: 62ch;
+  }
+
+  /* ---------- gaps ---------- */
+  .rc-gaps {
+    margin-top: clamp(36px, 5vh, 56px);
+  }
+  .rc-gaps-h {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin: 0 0 4px;
+  }
+  .rc-gap-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* The rows and their numbers are created by the client script, so they never
+     carry Astro's scope attribute. These two rules must be global or they
+     silently do nothing. */
+  .rc-gap-list :global(li) {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    border-bottom: 1px solid var(--hair);
+    padding: 16px 0;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--slate);
+  }
+  .rc-gap-list :global(.rc-gap-num) {
+    flex: none;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(45, 74, 92, 0.5);
+  }
+  .rc-gaps-note {
+    font-size: 15px;
+    line-height: 1.55;
+    color: rgba(45, 74, 92, 0.7);
+    margin: 18px 0 0;
+    max-width: 56ch;
+  }
+
+  /* ---------- form ---------- */
+  .rc-formwrap {
+    max-width: 560px;
+    margin-top: clamp(40px, 6vh, 68px);
+  }
+  .rc-form {
+    display: flex;
+    flex-direction: column;
+  }
+  .rc-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .rc-consent {
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(45, 74, 92, 0.7);
+    margin: 2px 0 0;
+    max-width: 52ch;
+  }
+  .rc-consent a {
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair-strong);
+  }
+  .rc-consent a:hover {
+    opacity: 0.66;
+  }
+  .rc-error {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--aubergine);
+    margin: 4px 0 0;
+  }
+  .rc-sent {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--slate);
+    margin: 0;
+    max-width: 56ch;
+  }
+  /* Off-screen rather than display:none, so bots that skip hidden fields still
+     find it, and people never see or tab to it. */
+  .rc-hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* ---------- sticky counter ---------- */
+  .rc-marker {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: var(--cream-90);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--hair);
+  }
+  .rc-marker-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px clamp(24px, 5vw, 56px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .rc-marker-count {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--slate);
+    line-height: 1.2;
+  }
+  .rc-marker-count small {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(45, 74, 92, 0.6);
+  }
+  .rc-marker .btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* ---------- footer ---------- */
+  .cfoot {
+    margin-top: clamp(48px, 7vh, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cfoot .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .cfoot .back:hover {
+    opacity: 0.66;
+  }
+  .cfoot .back .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cfoot .back:hover .arrow {
+    transform: translateX(5px);
+  }
+  .cfoot .mark {
+    font-size: 12px;
+    color: rgba(45, 74, 92, 0.55);
+  }
+
+  @media (max-width: 560px) {
+    .rc-marker-inner {
+      padding: 12px 20px;
+      gap: 12px;
+    }
+    .rc-marker-count {
+      font-size: 15px;
+    }
+    .rc-marker .btn {
+      padding: 9px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rc-toggle,
+    .rc-q-index,
+    .cfoot .back .arrow {
+      transition: none;
+    }
+  }
+</style>

@@ -23,6 +23,9 @@ const journal = defineCollection({
     // Hosted thumbnail URL. Empty string means no image.
     image: z.string().optional().default(''),
     draft: z.boolean().optional().default(false),
+    // Opt in to the quiet link to /readiness-check at the end of the post. Off
+    // by default, so only posts where it is genuinely relevant carry it.
+    readinessCheck: z.boolean().optional().default(false),
   }),
 });
 
