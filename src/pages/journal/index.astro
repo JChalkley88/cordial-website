@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
 import JournalNewsletter from '../../components/JournalNewsletter.astro';
 import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
+import { READINESS_IMAGES } from '../../lib/site';
 
 const allPosts = await getPublishedPosts();
 const posts = allPosts.slice(0, 3); // the preview shows a selection of recent posts
@@ -29,20 +30,25 @@ const description =
 
     <div class="journal-list tool-list">
       <article class="journal-entry tool-entry reveal-up">
-        <div class="je-inner">
-          <div class="je-meta">
-            <span class="je-label">ISO 9001 readiness check</span>
-            <span class="je-date">28 July 2026</span>
+        <div class="je-row">
+          <div class="je-inner">
+            <div class="je-meta">
+              <span class="je-label">ISO 9001 readiness check</span>
+              <span class="je-date">28 July 2026</span>
+            </div>
+            <a class="je-title-link" href="/journal/iso-9001-readiness-check">
+              <h2 class="je-title">How ready is your business for ISO 9001?</h2>
+            </a>
+            <p class="je-excerpt">
+              Fifteen yes-or-no questions on how you run the work already. You get a score, a band,
+              and a written breakdown of where your gaps are and what to do first.
+            </p>
+            <a class="tool-go" href="/journal/iso-9001-readiness-check">
+              Take the readiness check <span class="arrow">&rarr;</span>
+            </a>
           </div>
-          <a class="je-title-link" href="/journal/iso-9001-readiness-check">
-            <h2 class="je-title">How ready is your business for ISO 9001?</h2>
-          </a>
-          <p class="je-excerpt">
-            Fifteen yes-or-no questions on how you run the work already. You get a score, a band,
-            and a written breakdown of where your gaps are and what to do first.
-          </p>
-          <a class="tool-go" href="/journal/iso-9001-readiness-check">
-            Take the readiness check <span class="arrow">&rarr;</span>
+          <a class="je-thumb-link" href="/journal/iso-9001-readiness-check" aria-hidden="true" tabindex="-1">
+            <img class="je-thumb" src={READINESS_IMAGES.card} alt="" loading="lazy" />
           </a>
         </div>
       </article>

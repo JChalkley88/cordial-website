@@ -24,6 +24,18 @@ the CRM source `"website-iso-readiness-check"`, the marketing
 subscribe call, and the Resend fallback. `/api/readiness` is untouched,
 so the CRM needs nothing registered and no redeploy on its side.
 
+**Standing gap, not fixed here: Journal share images crop badly.**
+Every image in the `field-notes` bucket is square (1254x1254), and
+`[slug].astro` passes it straight to `og:image`. LinkedIn and most
+other share previews use 1.91:1, so a square is centre-cropped to
+about the middle half and loses the top and bottom quarter. This has
+been true of every Journal post since the start; nobody has been
+losing leads over it, but shared posts are not showing what we think
+they are showing. The readiness check carries a second, wider image
+for `og:image` to avoid it. When the Journal next gets a tidy, the
+existing posts want the same treatment: a 1200x630 cut alongside the
+square, and a second frontmatter field to carry it.
+
 Also in this change:
 
 - The burger menu is back to four items. "05 ISO 9001 readiness check"
