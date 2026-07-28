@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
 import JournalNewsletter from '../../components/JournalNewsletter.astro';
-import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
+import { getPublishedPosts, postPath, formatDate, READINESS_ENTRY } from '../../lib/journal';
 
 const allPosts = await getPublishedPosts();
 const posts = allPosts.slice(0, 3); // the preview shows a selection of recent posts
@@ -25,6 +25,29 @@ const description =
         What we are seeing inside UK businesses, and what to do about it. Field
         notes from the work, and the occasional piece from the desk.
       </p>
+    </div>
+
+    <div class="journal-list tool-list">
+      <article class="journal-entry tool-entry reveal-up">
+        <div class="je-row">
+          <div class="je-inner">
+            <div class="je-meta">
+              <span class="je-label">{READINESS_ENTRY.label}</span>
+              <span class="je-date">{formatDate(READINESS_ENTRY.date)}</span>
+            </div>
+            <a class="je-title-link" href={READINESS_ENTRY.href}>
+              <h2 class="je-title">{READINESS_ENTRY.title}</h2>
+            </a>
+            <p class="je-excerpt">{READINESS_ENTRY.excerpt}</p>
+            <a class="tool-go" href={READINESS_ENTRY.href}>
+              {READINESS_ENTRY.cta} <span class="arrow">&rarr;</span>
+            </a>
+          </div>
+          <a class="je-thumb-link" href={READINESS_ENTRY.href} aria-hidden="true" tabindex="-1">
+            <img class="je-thumb" src={READINESS_ENTRY.image} alt="" loading="lazy" />
+          </a>
+        </div>
+      </article>
     </div>
 
     {
@@ -118,6 +141,53 @@ const description =
     margin-top: 24px;
     max-width: 600px;
   }
+  /* The readiness check sits at the top of the feed as a plain typographic
+     card: Karla on cream, a hairline mark, no image. The mark is a hairline
+     rather than the aubergine, so the accent stays with the page eyebrow. */
+  /* The posts list below brings its own top hairline, so this one would double. */
+  .tool-list .journal-entry:last-child {
+    border-bottom: 0;
+  }
+  .tool-entry .je-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tool-entry .je-label::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--hair-strong);
+    flex: none;
+  }
+  .tool-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .tool-go:hover {
+    opacity: 0.66;
+  }
+  .tool-go .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tool-go:hover .arrow {
+    transform: translateX(5px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tool-go .arrow {
+      transition: none;
+    }
+  }
+
   /* compact, tidy list — fits comfortably, not stretched */
   .journal-entry {
     padding: clamp(16px, 2.2vh, 26px) 0;

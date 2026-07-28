@@ -24,8 +24,20 @@ export const NAV = [
   { idx: '02', label: 'The Journal', href: '/journal' },
   { idx: '03', label: 'Get in touch', href: '/contact' },
   { idx: '04', label: 'FAQs', href: '/faqs' },
-  { idx: '05', label: 'ISO 9001 readiness check', href: '/iso-readiness-check' },
 ] as const;
+
+// Images for the readiness check. It is a bespoke page rather than a Markdown
+// post, so it has no frontmatter to carry these; they live here so the card and
+// the share preview cannot drift apart.
+//
+// Two files on purpose. `card` is square, matching the other Journal images,
+// and the 3:2 card slot crops it gently. `og` is a wider cut of the same
+// composition, because a square centre-crops badly at the 1.91:1 that LinkedIn
+// and the like use.
+export const READINESS_IMAGES = {
+  card: 'https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/iso-9001-readiness-check.png',
+  og: 'https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/iso-9001-readiness-check-og.png',
+} as const;
 
 export const SOCIAL = {
   linkedin: 'https://www.linkedin.com/company/cordial-advisory',

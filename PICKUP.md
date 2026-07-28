@@ -3,6 +3,52 @@
 Running log of changes on this site that other projects depend on.
 Newest entry first.
 
+## 2026-07-28: the readiness check moved into the Journal
+
+The tool has moved from a standalone page to a Journal entry. Nothing
+about how it behaves changed, only where it lives.
+
+- Old URL: `/iso-readiness-check`. It was live from the Tuesday
+  morning merge until this change.
+- New URL: `/journal/iso-9001-readiness-check`.
+- The old URL 301s to the new one, set in `astro.config.mjs`. The
+  redirect is a real Vercel 301, not a meta refresh.
+
+**If you link to the tool from anywhere, use the new URL.** That
+includes the marketing app's digest copy and any post drafts. The old
+one keeps working, but it costs a hop.
+
+Unchanged, deliberately: the fifteen questions and their weights, the
+three bands, the email gate, the results email (content and visual),
+the CRM source `"website-iso-readiness-check"`, the marketing
+subscribe call, and the Resend fallback. `/api/readiness` is untouched,
+so the CRM needs nothing registered and no redeploy on its side.
+
+**Standing gap, not fixed here: Journal share images crop badly.**
+Every image in the `field-notes` bucket is square (1254x1254), and
+`[slug].astro` passes it straight to `og:image`. LinkedIn and most
+other share previews use 1.91:1, so a square is centre-cropped to
+about the middle half and loses the top and bottom quarter. This has
+been true of every Journal post since the start; nobody has been
+losing leads over it, but shared posts are not showing what we think
+they are showing. The readiness check carries a second, wider image
+for `og:image` to avoid it. When the Journal next gets a tidy, the
+existing posts want the same treatment: a 1200x630 cut alongside the
+square, and a second frontmatter field to carry it.
+
+Also in this change:
+
+- The burger menu is back to four items. "05 ISO 9001 readiness check"
+  is gone; the tool is reached from the Journal instead.
+- `/journal` carries the tool as a plain typographic card at the top of
+  the feed, above the recent posts.
+- The page is a bespoke Astro page, not Markdown, because the body is a
+  tool. It wears the Journal post furniture: header, byline, the tool's
+  own intro as the editorial opening, standard post footer.
+- `ReadinessCallout.astro` now points at the new URL, so Anthony's ISO
+  post picks it up without a frontmatter change. `readinessCheck: true`
+  stays as it was.
+
 ## 2026-07-24: ISO 9001 readiness check, new lead source
 
 Brief: `readiness-tool-handoff-brief.md` in `JChalkley88/ISO-Form`,

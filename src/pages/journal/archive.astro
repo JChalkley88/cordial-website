@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
-import { getPublishedPosts, postPath, formatDate } from '../../lib/journal';
+import { getFeed, formatDate } from '../../lib/journal';
 
-const posts = await getPublishedPosts();
-const featured = posts[0];
-const rest = posts.slice(1);
+// Everything, posts and the readiness check alike, newest first.
+const feed = await getFeed();
+const featured = feed[0];
+const rest = feed.slice(1);
 
 const title = 'The Journal, in full | Cordial Advisory';
 const description =
@@ -25,15 +26,15 @@ const description =
       featured && (
         <article class="featured">
           <div class="je-meta">
-            <span class="je-label">{featured.data.type}</span>
-            <span class="je-date">{formatDate(featured.data.date)}</span>
+            <span class="je-label">{featured.label}</span>
+            <span class="je-date">{formatDate(featured.date)}</span>
           </div>
-          <a class="je-title-link" href={postPath(featured)}>
-            <h2 class="ft-title">{featured.data.title}</h2>
+          <a class="je-title-link" href={featured.href}>
+            <h2 class="ft-title">{featured.title}</h2>
           </a>
-          <p class="ft-excerpt">{featured.data.excerpt}</p>
-          <a class="je-more" href={postPath(featured)}>
-            Read the piece <span class="arrow">&rarr;</span>
+          <p class="ft-excerpt">{featured.excerpt}</p>
+          <a class="je-more" href={featured.href}>
+            {featured.cta} <span class="arrow">&rarr;</span>
           </a>
         </article>
       )
@@ -42,16 +43,14 @@ const description =
     {
       rest.length > 0 && (
         <div class="notes">
-          {rest.map((post, i) => (
-            <a class:list={['note-row', !post.data.image && 'note-row--noimg']} href={postPath(post)}>
+          {rest.map((item, i) => (
+            <a class:list={['note-row', !item.image && 'note-row--noimg']} href={item.href}>
               <span class="nr-num">{String(i + 1).padStart(2, '0')}</span>
-              {post.data.image && (
-                <img class="nr-thumb" src={post.data.image} alt="" loading="lazy" />
-              )}
+              {item.image && <img class="nr-thumb" src={item.image} alt="" loading="lazy" />}
               <div class="nr-main">
-                <div class="nr-title">{post.data.title}</div>
+                <div class="nr-title">{item.title}</div>
                 <div class="nr-byline">
-                  <span class="who">{post.data.author}</span> &middot; {formatDate(post.data.date)} &middot; {post.data.type}
+                  <span class="who">{item.author}</span> &middot; {formatDate(item.date)} &middot; {item.label}
                 </div>
               </div>
               <span class="nr-go" aria-hidden="true">&rarr;</span>
