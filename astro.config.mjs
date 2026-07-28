@@ -16,6 +16,14 @@ export default defineConfig({
   build: {
     format: 'file',
   },
+  // The readiness check moved into the Journal. The old URL was live for a few
+  // days, so it keeps working and points at the new one.
+  redirects: {
+    '/iso-readiness-check': {
+      status: 301,
+      destination: '/journal/iso-9001-readiness-check',
+    },
+  },
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/api/'),

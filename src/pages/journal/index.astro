@@ -27,6 +27,27 @@ const description =
       </p>
     </div>
 
+    <div class="journal-list tool-list">
+      <article class="journal-entry tool-entry reveal-up">
+        <div class="je-inner">
+          <div class="je-meta">
+            <span class="je-label">ISO 9001 readiness check</span>
+            <span class="je-date">28 July 2026</span>
+          </div>
+          <a class="je-title-link" href="/journal/iso-9001-readiness-check">
+            <h2 class="je-title">How ready is your business for ISO 9001?</h2>
+          </a>
+          <p class="je-excerpt">
+            Fifteen yes-or-no questions on how you run the work already. You get a score, a band,
+            and a written breakdown of where your gaps are and what to do first.
+          </p>
+          <a class="tool-go" href="/journal/iso-9001-readiness-check">
+            Take the readiness check <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </article>
+    </div>
+
     {
       posts.length > 0 ? (
         <div class="journal-list">
@@ -118,6 +139,53 @@ const description =
     margin-top: 24px;
     max-width: 600px;
   }
+  /* The readiness check sits at the top of the feed as a plain typographic
+     card: Karla on cream, a hairline mark, no image. The mark is a hairline
+     rather than the aubergine, so the accent stays with the page eyebrow. */
+  /* The posts list below brings its own top hairline, so this one would double. */
+  .tool-list .journal-entry:last-child {
+    border-bottom: 0;
+  }
+  .tool-entry .je-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tool-entry .je-label::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--hair-strong);
+    flex: none;
+  }
+  .tool-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slate);
+    padding-bottom: 2px;
+  }
+  .tool-go:hover {
+    opacity: 0.66;
+  }
+  .tool-go .arrow {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tool-go:hover .arrow {
+    transform: translateX(5px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tool-go .arrow {
+      transition: none;
+    }
+  }
+
   /* compact, tidy list — fits comfortably, not stretched */
   .journal-entry {
     padding: clamp(16px, 2.2vh, 26px) 0;

@@ -24,7 +24,6 @@ export const NAV = [
   { idx: '02', label: 'The Journal', href: '/journal' },
   { idx: '03', label: 'Get in touch', href: '/contact' },
   { idx: '04', label: 'FAQs', href: '/faqs' },
-  { idx: '05', label: 'ISO 9001 readiness check', href: '/iso-readiness-check' },
 ] as const;
 
 export const SOCIAL = {

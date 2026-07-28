@@ -3,6 +3,40 @@
 Running log of changes on this site that other projects depend on.
 Newest entry first.
 
+## 2026-07-28: the readiness check moved into the Journal
+
+The tool has moved from a standalone page to a Journal entry. Nothing
+about how it behaves changed, only where it lives.
+
+- Old URL: `/iso-readiness-check`. It was live from the Tuesday
+  morning merge until this change.
+- New URL: `/journal/iso-9001-readiness-check`.
+- The old URL 301s to the new one, set in `astro.config.mjs`. The
+  redirect is a real Vercel 301, not a meta refresh.
+
+**If you link to the tool from anywhere, use the new URL.** That
+includes the marketing app's digest copy and any post drafts. The old
+one keeps working, but it costs a hop.
+
+Unchanged, deliberately: the fifteen questions and their weights, the
+three bands, the email gate, the results email (content and visual),
+the CRM source `"website-iso-readiness-check"`, the marketing
+subscribe call, and the Resend fallback. `/api/readiness` is untouched,
+so the CRM needs nothing registered and no redeploy on its side.
+
+Also in this change:
+
+- The burger menu is back to four items. "05 ISO 9001 readiness check"
+  is gone; the tool is reached from the Journal instead.
+- `/journal` carries the tool as a plain typographic card at the top of
+  the feed, above the recent posts.
+- The page is a bespoke Astro page, not Markdown, because the body is a
+  tool. It wears the Journal post furniture: header, byline, the tool's
+  own intro as the editorial opening, standard post footer.
+- `ReadinessCallout.astro` now points at the new URL, so Anthony's ISO
+  post picks it up without a frontmatter change. `readinessCheck: true`
+  stays as it was.
+
 ## 2026-07-24: ISO 9001 readiness check, new lead source
 
 Brief: `readiness-tool-handoff-brief.md` in `JChalkley88/ISO-Form`,
