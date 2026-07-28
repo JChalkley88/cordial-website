@@ -14,7 +14,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopBar from '../../components/TopBar.astro';
 import JournalNewsletter from '../../components/JournalNewsletter.astro';
 import { QUESTIONS, BANDS, SECTOR_OPTIONS, QUESTION_COUNT } from '../../lib/readiness';
-import { SITE } from '../../lib/site';
+import { SITE, READINESS_IMAGES } from '../../lib/site';
 
 const heading = 'How ready is your business for ISO 9001?';
 const title = `${heading} | Cordial Advisory`;
@@ -48,6 +48,7 @@ const articleLd = {
   datePublished: PUBLISHED,
   dateModified: PUBLISHED,
   mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  image: READINESS_IMAGES.og,
 };
 
 const appLd = {
@@ -68,6 +69,7 @@ const BIO = 'is a co-founder of Cordial Advisory, working on operations and proc
   description={description}
   theme="light"
   ogType="article"
+  ogImage={READINESS_IMAGES.og}
   menu={false}
   jsonLd={[articleLd, appLd]}
 >

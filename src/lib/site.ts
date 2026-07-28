@@ -36,6 +36,7 @@ export const NAV = [
 // and the like use.
 export const READINESS_IMAGES = {
   card: 'https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/iso-9001-readiness-check.png',
+  og: 'https://bfaywnutvnladvrfkpqn.supabase.co/storage/v1/object/public/field-notes/iso-9001-readiness-check-og.png',
 } as const;
 
 export const SOCIAL = {
