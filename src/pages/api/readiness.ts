@@ -145,8 +145,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       company,
       message: crmMessage({ sector, prompt, score, band: band.heading, gaps }),
       submittedAt,
+      // No howHeard and no referredByKey. This form asks the visitor no
+      // how-heard question, so there is nothing to record: the value sent here
+      // before was the hardcoded string "ISO readiness check", which is the
+      // channel, not how they heard of us. The channel is already carried by
+      // source above, so that field was saying the same thing twice and
+      // crowding out an answer nobody was ever asked for.
       source: READINESS_SOURCE,
-      howHeard: 'ISO readiness check',
     });
   } catch (err) {
     console.error('[readiness] CRM delivery failed, using fallback:', err);

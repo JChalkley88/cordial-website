@@ -13,7 +13,19 @@ export interface CrmLead {
   source: string;
   company?: string;
   phone?: string;
+  /**
+   * Legacy free-text how-heard. The CRM resolves it by matching the text
+   * against its referred-by labels, and never rejects it. Kept during the
+   * referredByKey verification window; see ContactSection.astro.
+   */
   howHeard?: string;
+  /**
+   * The CRM's referred_by_sources key. The structured path: the CRM validates
+   * it and answers 400 for a key it does not know, which this module throws on
+   * so the caller runs its Resend fallback. When both this and howHeard are
+   * present, the CRM's contract is that this one wins.
+   */
+  referredByKey?: string;
   submittedAt: string;
 }
 
@@ -40,6 +52,10 @@ export async function deliverToCrm(lead: CrmLead): Promise<string | undefined> {
       message: lead.message,
       source: lead.source,
       how_heard: lead.howHeard || undefined,
+      // Exact spelling matters: the CRM's inbound schema is not strict, so a
+      // field name it does not recognise is dropped without an error and the
+      // lead lands with no attribution at all.
+      referred_by_key: lead.referredByKey || undefined,
       submitted_at: lead.submittedAt,
     }),
   });

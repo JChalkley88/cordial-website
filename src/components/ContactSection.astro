@@ -10,15 +10,27 @@ interface Props {
 const { mode = 'full' } = Astro.props;
 const calm = mode === 'calm';
 
-// Friendly labels shown to the visitor, mapped to the exact CRM strings on
-// submit (data-crm) so reporting stays clean. No native <select>, no browser blue.
+// The six "How did you hear about us?" options. No native <select>, no browser blue.
+//
+// `key` is the CRM's referred_by_sources key and is what the CRM matches on.
+// Keys are stable: they do not change when a label is reworded, which is the
+// whole reason this field carries a key rather than the wording.
+//
+// This replaces an older mapping that submitted a second set of label-ish
+// strings ("Google / search", "Newsletter", "Recommendation", "Event or talk").
+// Those had drifted away from the CRM's wording, so four of the six resolved to
+// nothing and only LinkedIn and Other landed attributed.
+//
+// `label` is what the visitor reads. It also matches the CRM's label for the
+// same row exactly, which is what makes the legacy how_heard fallback below
+// work. Change a label here only alongside the CRM row it mirrors.
 const HEAR_OPTS = [
-  { label: 'Google or search', crm: 'Google / search' },
-  { label: 'LinkedIn', crm: 'LinkedIn' },
-  { label: 'Our newsletter', crm: 'Newsletter' },
-  { label: 'A recommendation', crm: 'Recommendation' },
-  { label: 'An event or talk', crm: 'Event or talk' },
-  { label: 'Other', crm: 'Other' },
+  { label: 'Google or search', key: 'google-or-search' },
+  { label: 'LinkedIn', key: 'linkedin' },
+  { label: 'Our newsletter', key: 'our-newsletter' },
+  { label: 'A recommendation', key: 'a-recommendation' },
+  { label: 'An event or talk', key: 'an-event-or-talk' },
+  { label: 'Other', key: 'other' },
 ];
 ---
 <section
@@ -77,7 +89,8 @@ const HEAR_OPTS = [
                   <li
                     class="gt-select-opt"
                     role="option"
-                    data-value={o.crm}
+                    data-value={o.key}
+                    data-label={o.label}
                     aria-selected="false"
                   >
                     {o.label}
@@ -85,7 +98,28 @@ const HEAR_OPTS = [
                 ))
               }
             </ul>
-            <input type="hidden" id="gt-hear" name="how_heard" value="" />
+            {/*
+              Two hidden fields, deliberately, for the verification window only.
+
+              referred_by_key is the real field: the CRM matches it against
+              referred_by_sources and rejects an unregistered key with a 400,
+              which this form's handler turns into a Resend fallback. A wrong
+              VALUE is therefore loud.
+
+              how_heard carries the display label and is the belt and braces. The
+              CRM's inbound schema is not strict, so an unknown FIELD NAME is
+              stripped silently and the lead lands unattributed with a 200: no
+              400, no fallback, nothing logged. That is the one failure here with
+              no signal attached. Because each label matches its CRM row exactly,
+              the legacy label-matching path resolves all six if that happens.
+              The CRM's documented contract is that referred_by_key wins when
+              both are present, so this is a fallback and not a double write.
+
+              FOLLOW-UP: drop how_heard, the data-label attribute and this
+              comment once a real submission is confirmed landing attributed.
+            */}
+            <input type="hidden" id="gt-hear-key" name="referred_by_key" data-hidden-key value="" />
+            <input type="hidden" id="gt-hear" name="how_heard" data-hidden-label value="" />
           </div>
         </div>
         <label class="gt-optin" for="gt-optin">
@@ -108,13 +142,17 @@ const HEAR_OPTS = [
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Brand-styled "How did you hear about us?" dropdown. Mirrors the chosen
-    // CRM value into the hidden #gt-hear input so the handler reads it like any field.
+    // option into two hidden inputs so the handler reads them like any field:
+    // the CRM key into #gt-hear-key, the display label into #gt-hear.
+    // Selected by data attribute, not by input[type="hidden"], because there are
+    // now two of them and position must not decide which gets which value.
     function wireSelect(scope) {
       const wrap = scope.querySelector('[data-select]');
       if (!wrap) return;
       const btn = wrap.querySelector('.gt-select-btn');
       const valEl = wrap.querySelector('[data-val]');
-      const hidden = wrap.querySelector('input[type="hidden"]');
+      const hiddenKey = wrap.querySelector('[data-hidden-key]');
+      const hiddenLabel = wrap.querySelector('[data-hidden-label]');
       const opts = Array.prototype.slice.call(wrap.querySelectorAll('.gt-select-opt'));
       let open = false, active = null;
 
@@ -123,7 +161,8 @@ const HEAR_OPTS = [
         opts.forEach((o) => o.setAttribute('aria-selected', o === opt ? 'true' : 'false'));
         valEl.textContent = opt.textContent;
         valEl.classList.remove('placeholder');
-        hidden.value = opt.getAttribute('data-value');
+        hiddenKey.value = opt.getAttribute('data-value');
+        hiddenLabel.value = opt.getAttribute('data-label');
         setOpen(false);
         btn.focus();
       }
@@ -186,6 +225,10 @@ const HEAR_OPTS = [
           phone: get('#gt-phone'),
           company: get('#gt-co'),
           message,
+          // Spelling is load-bearing: the CRM strips an unknown field name
+          // silently and answers 200, so a typo here loses attribution with no
+          // error anywhere. Matches the inbound schema's referred_by_key.
+          referred_by_key: get('#gt-hear-key'),
           how_heard: get('#gt-hear'),
           newsletter: !!(form.querySelector('#gt-optin') && form.querySelector('#gt-optin').checked),
           submitted_at: new Date().toISOString(),

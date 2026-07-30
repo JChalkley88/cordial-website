@@ -32,6 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
   const company = str(body.company);
   const message = str(body.message);
   const howHeard = str(body.how_heard);
+  const referredByKey = str(body.referred_by_key);
   const newsletter = body.newsletter === true;
   const submittedAt = str(body.submitted_at) || new Date().toISOString();
 
@@ -52,6 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
       company,
       message,
       howHeard,
+      referredByKey,
       submittedAt,
       source: SOURCE,
     });
@@ -65,6 +67,9 @@ export const POST: APIRoute = async ({ request }) => {
       `Phone: ${phone || '-'}`,
       `Company: ${company || '-'}`,
       `How heard: ${howHeard || '-'}`,
+      // The key is in here too because a rejected key is one of the ways this
+      // email gets sent, and it is the first thing to check when it does.
+      `Referred-by key: ${referredByKey || '-'}`,
       `Newsletter: ${newsletter ? 'yes' : 'no'}`,
       '',
       'Message:',
